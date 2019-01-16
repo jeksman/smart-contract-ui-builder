@@ -1,4 +1,4 @@
-const config = {
+const compoundConfig = {
 
   container: null, // will be set to this.cyRef
 
@@ -81,7 +81,7 @@ const config = {
   }
 }
 
-const style = {
+const compoundStyle = {
   height: '100%',
   width: '100%',
   position: 'absolute',
@@ -91,8 +91,12 @@ const style = {
 }
 
 const compound = {
-  config: config,
-  style: style
+  config: compoundConfig,
+  style: compoundStyle
+}
+
+const graphs = {
+  compound: compound
 }
 
 export default compound
