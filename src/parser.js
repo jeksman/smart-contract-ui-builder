@@ -35,65 +35,64 @@ const util = require('util')
  * @return {object}              the elements for a Cytoscape graph
  */
 function parse(contractJSON) {
-  return {
-    nodes: getNodes(contractJSON.contractName, contractJSON.abi),
-    edges: getEdges(contractJSON.contractName, contractJSON.abi)
-  }
+    return {
+        nodes: getNodes(contractJSON.contractName, contractJSON.abi),
+        edges: getEdges(contractJSON.contractName, contractJSON.abi)
+    }
 }
 
 function getNodes(contractName, abiJSON) {
-  
-  let nodes = []
 
-  // contract node (parent of all others)
-  nodes.push({data: { id: contractName}, position: {x: 0, y: 0}})
+    let nodes = []
 
-  for (let entry of abiJSON) {
-    nodes.push(getNode(contractName, entry))
-  }
+    // contract node (parent of all others)
+    nodes.push({data: { id: contractName}, position: {x: 0, y: 0}})
 
-  return nodes
+    for (let entry of abiJSON) {
+        nodes.push(getNode(contractName, entry))
+    }
+
+    return nodes
 }
 
 function getNode(contractName, entry) {
 
-  if ( !(entry.type === 'function') 
-    && !(entry.type === 'constructor')
-    && !(entry.type === 'event')  ) {
-    throw new Error('Invalid abi entry type:\n\n' + util.inspect(entry, {showHidden: false, depth: null}) + '\n')
-  }
+    if ( !(entry.type === 'function')
+        && !(entry.type === 'constructor')
+        && !(entry.type === 'event')  ) {
+        throw new Error('Invalid abi entry type:\n\n' + util.inspect(entry, {showHidden: false, depth: null}) + '\n')
+    }
 
-  let data = { abi: {} }
-  if (entry.type === 'constructor') {
-    data.id = 'constructor'
-  } else {
-    if (!entry.name) throw new Error('getNode: invalid ABI entry: missing name')
-    data.id = entry.name
-  }
-  data.parent = contractName
-  entry.type ? data.abi.type = entry.type : 'function' // type defaults to function if omitted
+    let data = { abi: {} }
+    if (entry.type === 'constructor') {
+        data.id = 'constructor'
+    } else {
+        if (!entry.name) throw new Error('getNode: invalid ABI entry: missing name')
+        data.id = entry.name
+    }
+    data.parent = contractName
+    entry.type ? data.type = entry.type : data.type = 'function' // abi type defaults to function if omitted
 
-  data.abi = Object.assign(data.abi, entry)
+    data.abi = Object.assign(data.abi, entry) // abi may or may not have the type property
 
-  return {
-    data: data,
-    position: { x: 0, y: 0}
-  }
+    return {
+        data: data,
+        position: { x: 0, y: 0}
+    }
 }
 
-// these two may be more complicated
 function getEdges(abiJSON) {
-  // TODO
-  return {}
+    // TODO
+    return {}
 }
 
 function getEdge(param) {
-  // TODO
+    // TODO
 }
 
 
-// const StandardERC20_JSON = require('./dev-temp/StandardERC20.json')
-// const elements = getElements(StandardERC20_JSON)
-// console.log(util.inspect(elements, {showHidden: false, depth: null}))
+const StandardERC20_JSON = require('./dev-temp/StandardERC20.json')
+const elements = parse(StandardERC20_JSON)
+console.log(util.inspect(elements, {showHidden: false, depth: null}))
 
 module.exports = parse
