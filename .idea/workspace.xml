@@ -11,16 +11,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="index.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/index.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="grapher.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/grapher.js">
           <provider selected="true" editor-type-id="text-editor">
@@ -63,7 +53,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="App.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="App.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/components/App.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="135">
@@ -75,6 +65,16 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="parser.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/parser.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="403">
+              <caret line="98" column="0" lean-forward="false" selection-start-line="98" selection-start-column="0" selection-end-line="98" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="Grapher.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/components/Grapher.js">
           <provider selected="true" editor-type-id="text-editor">
@@ -82,6 +82,7 @@
               <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding>
                 <element signature="e#0#40#0" expanded="true" />
+                <marker date="1547634384423" expanded="true" signature="1140:1198" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -136,6 +137,7 @@
         <option value="$PROJECT_DIR$/package-lock.json" />
         <option value="$PROJECT_DIR$/LICENSE" />
         <option value="$PROJECT_DIR$/package.json" />
+        <option value="$PROJECT_DIR$/src/parser.js" />
       </list>
     </option>
   </component>
@@ -321,12 +323,12 @@
       <option name="presentableId" value="Default" />
       <updated>1547632775780</updated>
       <workItem from="1547632777524" duration="802000" />
-      <workItem from="1547633844931" duration="524000" />
+      <workItem from="1547633844931" duration="822000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1326000" />
+    <option name="totallyTimeSpent" value="1624000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -627,6 +629,7 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#40#0" expanded="true" />
+            <marker date="1547634384423" expanded="true" signature="1140:1198" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -638,6 +641,14 @@
           <folding>
             <element signature="e#0#41#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/parser.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="403">
+          <caret line="98" column="0" lean-forward="false" selection-start-line="98" selection-start-column="0" selection-end-line="98" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
