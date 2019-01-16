@@ -1,10 +1,13 @@
 {
-  "name": "smart-contract-ui-builder",
+  "name": "smart-comtract-ui-builder",
   "version": "0.0.0",
   "description": "Takes one or several smart contracts as inputs and represents their relationships as a graph",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "mocha"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
   },
   "repository": {
     "type": "git",
@@ -20,11 +23,16 @@
     "graphical",
     "GUI"
   ],
-  "author": "Eugene Kyselov <admin@profsite.com.ua>",
-  "license": "MIT",
+  "author": "Eugene Kyselev <admin@profsite.com.ua>",
+  "license": "WTFPL",
   "dependencies": {
     "chai": "^4.1.2",
+    "cytoscape": "^3.2.14",
+    "cytoscape-dagre": "^2.2.1",
     "mocha": "^5.2.0",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "react-scripts": "1.1.4",
     "smart-contract-deployment-manager": "^0.1.0"
   }
 }
