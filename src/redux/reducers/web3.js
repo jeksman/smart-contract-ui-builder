@@ -1,6 +1,8 @@
 
 import Web3 from 'web3'
 
+import { initializeDeployer } from './contracts'
+
 const ACTIONS = {
   GET_WEB3: 'WEB3:GET_WEB3',
   GET_WEB3_SUCCESS: 'WEB3:GET_WEB3_SUCCESS',
@@ -8,18 +10,21 @@ const ACTIONS = {
   GET_ACCOUNT: 'WEB3:GET_ACCOUNT',
   GET_ACCOUNT_SUCCESS: 'WEB3:GET_ACCOUNT_SUCCESS',
   GET_ACCOUNT_FAILURE: 'WEB3:GET_ACCOUNT_FAILURE',
+  CLEAR_ERRORS: 'WEB3:CLEAR_ERRORS',
 }
 
 const initialState = {
-  ready: false,
-  injected: null,
   account: null,
-  web3Error: null,
+  injected: null,
+  networkId: null,
+  provider: null,
+  ready: false,
+  web3Errors: [],
 }
 
 export {
   getWeb3Thunk as getWeb3,
-  ACTIONS,
+  getClearErrorsAction as clearweb3Errorss,
 }
 
 export default function reducer (state = initialState, action) {
@@ -31,38 +36,52 @@ export default function reducer (state = initialState, action) {
         ...state,
         ready: false,
         injected: null,
-        web3Error: null,
+        networkId: null,
+        web3Errors: [],
         account: null,
       }
+
     case ACTIONS.GET_WEB3_SUCCESS:
       return {
         ...state,
         ready: true,
         injected: action.injectedWeb3,
+        provider: action.injectedWeb3.currentProvider,
       }
+
     case ACTIONS.GET_WEB3_FAILURE:
       return {
         ...state,
-        web3Error: action.error,
+        web3Errors: state.web3Errors.concat([action.error]),
       }
+
     case ACTIONS.GET_ACCOUNT:
       return {
         ...state,
         ready: false,
         account: null,
-        web3Error: null,
       }
+
     case ACTIONS.GET_ACCOUNT_SUCCESS:
       return {
         ...state,
         ready: true,
         account: action.account,
+        networkId: action.networkId,
       }
+
     case ACTIONS.GET_ACCOUNT_FAILURE:
       return {
         ...state,
-        web3Error: action.error,
+        web3Errors: state.web3Errors.concat([action.error]),
       }
+
+    case ACTIONS.CLEAR_ERRORS:
+      return {
+        ...state,
+        web3Errors: [],
+      }
+
     default:
       return state
   }
@@ -96,10 +115,11 @@ function getAccountAction () {
   }
 }
 
-function getAccountSuccessAction (account) {
+function getAccountSuccessAction (account, networkId) {
   return {
     type: ACTIONS.GET_ACCOUNT_SUCCESS,
     account: account,
+    networkId: networkId,
   }
 }
 
@@ -110,8 +130,18 @@ function getAccountFailureAction (error) {
   }
 }
 
+function getClearErrorsAction () {
+  return {
+    type: ACTIONS.CLEAR_ERRORS,
+  }
+}
+
 /* Asynchronous action creators */
 
+/**
+ * [getWeb3Thunk description]
+ * @return {[type]} [description]
+ */
 function getWeb3Thunk () {
 
   return async dispatch => {
@@ -133,29 +163,37 @@ function getWeb3Thunk () {
       console.log('Please install MetaMask.')
       dispatch(getWeb3FailureAction(new Error('No MetaMask found')))
       return
-      // no fallback for now
+      // TODO: what's the fallback?
       // fallback - local node / hosted node + in-dapp id mgmt / fail
       // web3 = await new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
     }
 
-    if (web3) {
+    if (web3 &&
+      web3.currentProvider.constructor.name === 'MetamaskInpageProvider') {
+
       dispatch(getWeb3SuccessAction(web3))
       dispatch(getWeb3AccountThunk(web3))
     } else {
-      dispatch(getWeb3FailureAction(new Error('no web3 retrieved')))
+      dispatch(getWeb3FailureAction(new Error('invalid web3', web3)))
     }
   }
 }
 
+/**
+ * [getWeb3AccountThunk description]
+ * @param  {[type]} web3 [description]
+ * @return {[type]}      [description]
+ */
 function getWeb3AccountThunk (web3) {
 
   return async dispatch => {
 
     dispatch(getAccountAction())
 
-    let accounts
+    let accounts, networkId
     try {
       accounts = await web3.eth.getAccounts()
+      networkId = await web3.eth.net.getId()
     } catch (error) {
       dispatch(getAccountFailureAction(error))
       return
@@ -168,6 +206,7 @@ function getWeb3AccountThunk (web3) {
     }
 
     if (accounts.length !== 1) console.log('WARNING: More than one account found.', accounts)
-    dispatch(getAccountSuccessAction(accounts[0]))
+    dispatch(getAccountSuccessAction(accounts[0], networkId))
+    dispatch(initializeDeployer())
   }
 }

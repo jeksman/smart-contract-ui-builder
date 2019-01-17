@@ -7,19 +7,22 @@ import './style/ContractForm.css'
 
 // react-jsonschema-form logger
 const log = (type) => console.log.bind(console, type)
+// const onSubmit = (formData) => console.log("Data submitted: ",  formData)
 
 export default class ContractForm extends Component {
 
   constructor (props) {
     super(props)
-    this.state = {formProps: null}
+    this.state = {formData: null}
   }
 
+  // gene
   componentDidMount () {
     this.setState((prevProps, props) => {
+      // console.log(prevProps, props)
       // TODO: this check fails because contracts don't have unique IDs
       if (prevProps.contractName !== props.contractName) {
-        return { formProps: generateForm(props.nodes)}
+        return { formData: generateForm(props.nodes)}
       }
       return {}
     })
@@ -31,14 +34,19 @@ export default class ContractForm extends Component {
 
     return (
       <div className="ContractForm-formContainer">
-        { 
-          this.state.formProps 
+        {
+          this.state.formData
             ? <Form
                 className="ContractForm-form"
-                schema={this.state.formProps.schema}
-                uiSchema={this.state.formProps.uiSchema}
+                schema={this.state.formData.schema}
+                uiSchema={this.state.formData.uiSchema}
                 onChange={log('changed')}
-                onSubmit={log('submitted')}
+                onSubmit={
+                  (formData) => (this.props.deploy(
+                    formData.schema.title,
+                    Object.values(formData.formData)
+                  ))
+                }
                 onError={log('errors')} />
             : ''
         }
@@ -50,6 +58,7 @@ export default class ContractForm extends Component {
 ContractForm.propTypes = {
   nodes: PropTypes.array,
   contractName: PropTypes.string,
+  deploy: PropTypes.func,
 }
 
 /* helper functions */
@@ -74,68 +83,69 @@ function generateForm (nodes) {
   }
 
   const uiSchema = {
-    'ui:order': [],
+    'ui:order': [], // parameter fields will be pushed in their correct order
   }
 
   nodes.forEach(node => {
-    
+
+    // contract name = form title
     if (node.data.type === 'contract') {
-      
+
       schema.title = node.data.nodeName
-    
+
     } else {
 
+      // parse node data to create corresponding field object
       const field = {
         type: parseSolidityType(node.data.abi.type),
         title: node.data.nodeName,
         parameterName: node.data.abi.name,
       }
+
       schema.properties[field.parameterName] = field
       schema.required.push(field.parameterName)
 
       uiSchema['ui:order'].push(field.parameterName)
-      uiSchema[field.parameterName] = {}
-      uiSchema[field.parameterName]['ui:placeholder'] = 
-        node.data.abi.type + ': ' + node.data.abi.name
+      uiSchema[field.parameterName] = {
+        'ui:placeholder': node.data.abi.type + ': ' + node.data.abi.name,
+      }
+
     }
   })
-
-  // will list fields alphabetically
-  uiSchema['ui:order'].sort()
 
   return {schema, uiSchema}
 }
 
 /**
- * Takes a Solidity function parameter type and ouputs the appropriate 
+ * Takes a Solidity function parameter type and ouputs the appropriate
  * type for a react-jsonschema-form field
- * @param  {string} parameterType a Solidity function parameter 
+ * @param  {string} parameterType a Solidity function parameter
  * @return {string}               the corresponding form field type
  */
 function parseSolidityType (parameterType) {
 
-  // TODO: 
+  // TODO:
   // - better array and address handling
-  // - other missing specific datatype cases 
+  // - other missing specific datatype cases
 
   switch (parameterType) {
 
-    case parameterType.slice(-2) === '[]':
-      return 'string' // array
+    case parameterType.slice(-2) === '[]': // array
+      return 'string'
 
     case 'bool':
       return 'boolean'
 
-    case 
+    case
       parameterType.slice(0, 4) === 'uint' ||
       parameterType.slice(0, 3) === 'int':
-        
+
         return 'integer'
 
-    case 
+    case
       parameterType.slice(0, 6) === 'fixed' ||
       parameterType.slice(0, 7) === 'ufixed':
-        
+
         return 'number'
 
     default:
