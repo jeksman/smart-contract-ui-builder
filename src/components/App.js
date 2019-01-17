@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 
 import Grapher from './Grapher'
 import Header from './Header'
-import './App.css'
+import './style/App.css'
 
 import { getWeb3 } from '../redux/web3'
 
@@ -43,14 +43,14 @@ App.propTypes = {
   getWeb3: PropTypes.func,
 }
 
-const mapStateToProps = state => {
+function mapStateToProps (state) {
   // console.log('mapStateToProps', state)
   return {
     web3: state.web3.injected,
   }
 }
 
-const mapDispatchToProps = dispatch => {
+function mapDispatchToProps (dispatch) {
   return {
     getWeb3: () => dispatch(getWeb3()),
   }

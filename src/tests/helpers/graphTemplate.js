@@ -1,4 +1,5 @@
-const compoundConfig = {
+
+const config = {
 
   container: null, // will be set to this.cyRef
 
@@ -59,21 +60,7 @@ const compoundConfig = {
     },
   ],
 
-  elements: {
-    nodes: [
-      { data: { id: 'a', parent: 'b' }, position: { x: 215, y: 85 } },
-      { data: { id: 'b' } },
-      { data: { id: 'c', parent: 'b' }, position: { x: 300, y: 85 } },
-      { data: { id: 'd' }, position: { x: 215, y: 175 } },
-      { data: { id: 'e' } },
-      { data: { id: 'f', parent: 'e' }, position: { x: 300, y: 175 } },
-    ],
-    edges: [
-      { data: { id: 'ad', source: 'a', target: 'd' } },
-      { data: { id: 'eb', source: 'e', target: 'b' } },
-
-    ],
-  },
+  elements: {},
 
   layout: {
     name: 'preset',
@@ -81,7 +68,7 @@ const compoundConfig = {
   },
 }
 
-const compoundStyle = {
+const style = {
   height: '100%',
   width: '100%',
   position: 'absolute',
@@ -90,13 +77,9 @@ const compoundStyle = {
   // 'zIndex': '-10', // otherwise the damn thing appears on top
 }
 
-const compound = {
-  config: compoundConfig,
-  style: compoundStyle,
+const template = {
+  config: config,
+  style: style,
 }
 
-// const graphs = {
-//   compound: compound
-// }
-
-export default compound
+module.exports = template

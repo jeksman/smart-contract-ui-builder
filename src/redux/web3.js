@@ -1,3 +1,4 @@
+
 import Web3 from 'web3'
 
 const ACTIONS = {
@@ -8,6 +9,66 @@ const ACTIONS = {
   GET_ACCOUNT_SUCCESS: 'WEB3:GET_ACCOUNT_SUCCESS',
   GET_ACCOUNT_FAILURE: 'WEB3:GET_ACCOUNT_FAILURE',
 }
+
+const initialState = {
+  ready: false,
+  injected: null,
+  account: null,
+  web3Error: null,
+}
+
+export {
+  getWeb3Thunk as getWeb3,
+  ACTIONS,
+}
+
+export default function reducer (state = initialState, action) {
+
+  switch (action.type) {
+
+    case ACTIONS.GET_WEB3:
+      return {
+        ...state,
+        ready: false,
+        injected: null,
+        web3Error: null,
+        account: null,
+      }
+    case ACTIONS.GET_WEB3_SUCCESS:
+      return {
+        ...state,
+        ready: true,
+        injected: action.injectedWeb3,
+      }
+    case ACTIONS.GET_WEB3_FAILURE:
+      return {
+        ...state,
+        web3Error: action.error,
+      }
+    case ACTIONS.GET_ACCOUNT:
+      return {
+        ...state,
+        ready: false,
+        account: null,
+        web3Error: null,
+      }
+    case ACTIONS.GET_ACCOUNT_SUCCESS:
+      return {
+        ...state,
+        ready: true,
+        account: action.account,
+      }
+    case ACTIONS.GET_ACCOUNT_FAILURE:
+      return {
+        ...state,
+        web3Error: action.error,
+      }
+    default:
+      return state
+  }
+}
+
+/* Synchronous action creators */
 
 function getWeb3Action () {
   return {
@@ -49,59 +110,9 @@ function getAccountFailureAction (error) {
   }
 }
 
-const initialState = {
-  ready: false,
-  injected: null,
-}
+/* Asynchronous action creators */
 
-export default function reducer (state = initialState, action) {
-
-  switch (action.type) {
-
-    case ACTIONS.GET_WEB3:
-      return {
-        ...state,
-        ready: false,
-        injected: null,
-      }
-    case ACTIONS.GET_WEB3_SUCCESS:
-      // console.log(state)
-      // console.log(action)
-      return {
-        ...state,
-        ready: true,
-        injected: action.injectedWeb3,
-      }
-    case ACTIONS.GET_WEB3_FAILURE:
-      return {
-        ...state,
-        ready: false,
-        web3Error: action.error,
-      }
-    case ACTIONS.GET_ACCOUNT:
-      return {
-        ...state,
-        ready: false,
-        account: null,
-      }
-    case ACTIONS.GET_ACCOUNT_SUCCESS:
-      return {
-        ...state,
-        ready: true,
-        account: action.account,
-      }
-    case ACTIONS.GET_ACCOUNT_FAILURE:
-      return {
-        ...state,
-        ready: false,
-        web3Error: action.error,
-      }
-    default:
-      return state
-  }
-}
-
-function getWeb3 () {
+function getWeb3Thunk () {
 
   return async dispatch => {
 
@@ -116,12 +127,12 @@ function getWeb3 () {
         web3 = await new Web3(window.web3.currentProvider)
       } catch (error) {
         dispatch(getWeb3FailureAction(error))
-        return null
+        return
       }
     } else {
       console.log('Please install MetaMask.')
       dispatch(getWeb3FailureAction(new Error('No MetaMask found')))
-      return null
+      return
       // no fallback for now
       // fallback - local node / hosted node + in-dapp id mgmt / fail
       // web3 = await new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
@@ -129,16 +140,14 @@ function getWeb3 () {
 
     if (web3) {
       dispatch(getWeb3SuccessAction(web3))
-      dispatch(getWeb3Account(web3))
+      dispatch(getWeb3AccountThunk(web3))
     } else {
       dispatch(getWeb3FailureAction(new Error('no web3 retrieved')))
     }
-
-    return web3
   }
 }
 
-function getWeb3Account (web3) {
+function getWeb3AccountThunk (web3) {
 
   return async dispatch => {
 
@@ -149,23 +158,16 @@ function getWeb3Account (web3) {
       accounts = await web3.eth.getAccounts()
     } catch (error) {
       dispatch(getAccountFailureAction(error))
-      return null
+      return
     }
 
     if (!accounts || accounts.length < 1) {
       dispatch(getAccountFailureAction(new Error(
         'missing or invalid accounts array', accounts)))
-      return null
+      return
     }
 
     if (accounts.length !== 1) console.log('WARNING: More than one account found.', accounts)
     dispatch(getAccountSuccessAction(accounts[0]))
-    return accounts[0]
   }
-}
-
-export {
-  getWeb3,
-  getWeb3Account,
-  ACTIONS,
 }

@@ -8,25 +8,6 @@
  * Relevant: https://solidity.readthedocs.io/en/develop/abi-spec.html#JSON
  */
 
-// example nodes and edges
-/**
- * elements: {
-    nodes: [
-      { data: { id: 'a', parent: 'b' }, position: { x: 215, y: 85 } },
-      { data: { id: 'b' } },
-      { data: { id: 'c', parent: 'b' }, position: { x: 300, y: 85 } },
-      { data: { id: 'd' }, position: { x: 215, y: 175 } },
-      { data: { id: 'e' } },
-      { data: { id: 'f', parent: 'e' }, position: { x: 300, y: 175 } }
-    ],
-    edges: [
-      { data: { id: 'ad', source: 'a', target: 'd' } },
-      { data: { id: 'eb', source: 'e', target: 'b' } }
-
-    ]
-  },
- */
-
 const util = require('util')
 
 /**
@@ -34,7 +15,7 @@ const util = require('util')
  * @param  {object} contractJSON the compiled contract to parse
  * @return {object}              the elements for a Cytoscape graph
  */
-function parse (contractJSON, mode) {
+export default function parseContract (contractJSON, mode) {
   return {
     nodes: getNodes(contractJSON.contractName, contractJSON.abi, mode),
     edges: getEdges(contractJSON.contractName, contractJSON.abi, mode),
@@ -46,7 +27,13 @@ function getNodes (contractName, abi, mode) {
   let nodes = []
 
   // contract node (parent of all others)
-  const contractNode = {data: { id: contractName}, position: {x: 0, y: 0}}
+  const contractNode = {
+    data: {
+      id: contractName,
+      name: getFormattedName(contractName),
+    },
+    position: {x: 0, y: 0},
+  }
 
   switch (mode) {
     case 0:
@@ -77,9 +64,11 @@ function getNodeAll (contractName, entry) {
   const data = { abi: {} }
   if (entry.type === 'constructor') {
     data.id = contractName + ':constructor'
+    data.name = 'Constructor'
   } else {
     if (!entry.name) throw new Error('getNode: invalid ABI entry: missing name')
     data.id = contractName + ':' + entry.name
+    data.name = getFormattedName(entry.name)
   }
   data.parent = contractName
   entry.type ? data.type = entry.type : data.type = 'function' // abi type defaults to function if omitted
@@ -107,6 +96,7 @@ function getConstructorNodes (contractName, abi) {
     inputNodes.push({
       data: {
         id: contractName + ':constructor:' + input.name,
+        name: getFormattedName(input.name),
         parent: contractName,
         type: 'parameter',
         abi: input,
@@ -127,9 +117,13 @@ function getEdges (abiJSON) {
 //   // TODO
 // }
 
+/* helpers */
 
-// const StandardErc20Json = require('./dev-temp/StandardERC20.json')
-// const elements = parse(StandardErc20Json, 0)
+function getFormattedName (name) {
+  const formattedName = name.substring(name.search(/[a-z]/i)) // regex: /i indicates ignorecase
+  return formattedName.charAt(0).toUpperCase() + formattedName.slice(1)
+}
+
+// const StandardErc20Json = require('chain-end').contracts.StandardERC20
+// const elements = parse(StandardErc20Json, 1)
 // console.log(util.inspect(elements, {showHidden: false, depth: null}))
-
-module.exports = parse
