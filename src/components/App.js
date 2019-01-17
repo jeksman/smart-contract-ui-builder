@@ -1,13 +1,17 @@
+
+import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import PropTypes from 'prop-types'
-// import Web3 from 'web3'
+import { BrowserRouter, Route, Switch } from 'react-router-dom'
 
+import ContractForm from './ContractForm'
 import Grapher from './Grapher'
 import Header from './Header'
+import Home from './Home'
 import './style/App.css'
 
-import { getWeb3 } from '../redux/web3'
+import { logRenderError } from '../redux/reducers/renderErrors'
+import { getWeb3 } from '../redux/reducers/web3'
 
 class App extends Component {
 
@@ -17,16 +21,40 @@ class App extends Component {
   }
 
   // componentWillReceiveProps (nextProps) {
-  //   debugger
   //   console.log(nextProps)
   // }
+
+  componentDidCatch (error, errorInfo) {
+    // Catch errors in any components below and re-render with error message
+    this.props.logRenderError(error, errorInfo)
+  }
 
   render () {
     // console.log('App render', this.props.web3 && this.props.web3.version)
     return (
       <div className="App">
-        <Header version={this.props.web3 ? this.props.web3.version : 'nil'}/>
-        <Grapher />
+        <BrowserRouter>
+          <div>
+            <Header
+              web3Injected={!!this.props.web3}
+            />
+            <div className="App-canvas-container">
+              <Switch>
+                <Route exact path="/" component={Home} />
+                <Route
+                  path="/dapp-graph"
+                  render={
+                    () => <Grapher graph={this.props.graph} /> } />
+                <Route
+                  path="/contract-form"
+                  render={
+                    () => <ContractForm
+                      nodes={this.props.graph.config.elements.nodes}
+                      contractName={this.props.graph.name} /> } />
+              </Switch>
+            </div>
+          </div>
+        </BrowserRouter>
       </div>
     )
   }
@@ -41,18 +69,21 @@ App.propTypes = {
     }
   },
   getWeb3: PropTypes.func,
+  logRenderError: PropTypes.func,
+  graph: PropTypes.object,
 }
 
 function mapStateToProps (state) {
-  // console.log('mapStateToProps', state)
   return {
     web3: state.web3.injected,
+    graph: state.grapher.selectedGraph,
   }
 }
 
 function mapDispatchToProps (dispatch) {
   return {
     getWeb3: () => dispatch(getWeb3()),
+    logRenderError: (error, errorInfo) => dispatch(logRenderError(error, errorInfo)),
   }
 }
 
@@ -60,12 +91,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(App)
-
-// export default connect(
-//   state => ({
-//     web3: state.web3,
-//   }),
-//   dispatch => ({
-//     getWeb3: () => dispatch(getWeb3Action()),
-//   })
-// )(App)

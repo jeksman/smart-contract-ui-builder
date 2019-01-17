@@ -1,5 +1,5 @@
 {
-  "name": "dapp-grapher",
+  "name": "smart-contract-ui-builder",
   "version": "0.0.0",
   "description": "Takes one or several smart contracts as inputs and represents their relationships as a graph",
   "private": true,
@@ -10,8 +10,7 @@
     "eject": "react-scripts eject"
   },
   "repository": {
-    "type": "git",
-    "url": "git+https://github.com/rekmarks/dapp-grapher.git"
+    "type": "git"
   },
   "keywords": [
     "Ethereum",
@@ -24,20 +23,20 @@
     "graphical",
     "GUI"
   ],
-  "author": "Erik Marks <rekmarks@icloud.com>",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/rekmarks/dapp-grapher/issues"
-  },
-  "homepage": "https://github.com/rekmarks/dapp-grapher#readme",
+
   "dependencies": {
+    "bootstrap": "^3.3.7",
     "chain-end": "^0.1.2",
     "cytoscape": "^3.2.14",
     "cytoscape-dagre": "^2.2.1",
     "immutable": "^3.8.2",
     "react": "^16.4.1",
+    "react-bootstrap": "^0.32.1",
     "react-dom": "^16.4.1",
+    "react-jsonschema-form": "^1.0.3",
     "react-redux": "^5.0.7",
+    "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.4",
     "redux": "^4.0.0",
     "redux-logger": "^3.0.6",

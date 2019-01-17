@@ -1,6 +1,9 @@
-import React, { Component } from 'react'
+
 import PropTypes from 'prop-types'
-import './style/App.css'
+import React, { Component } from 'react'
+import { NavLink } from 'react-router-dom'
+
+import './style/Header.css'
 
 class Header extends Component {
   render () {
@@ -9,12 +12,36 @@ class Header extends Component {
       <div>
         <header className="Header">
           <h1 className="Header-title">Dapp Grapher</h1>
-          <p className="Header-info">
-            { this.props.version
-              ? 'Logged in with MetaMask'
-              : 'Please log in with MetaMask'
-            }
-          </p>
+          <div className = "Header-items">
+            <div>
+              <p className="Header-info">
+                { this.props.web3Injected
+                  ? 'Logged in with MetaMask'
+                  : 'Please log in with MetaMask'
+                }
+              </p>
+              <NavLink
+                className="Header-nav"
+                activeClassName="Header-active-nav"
+                exact to="/" >
+                Home
+              </NavLink>
+              {' '}
+              <NavLink
+                className="Header-nav"
+                activeClassName="Header-active-nav"
+                to="/dapp-graph" >
+                Graph
+                </NavLink>
+              {' '}
+              <NavLink
+                className="Header-nav"
+                activeClassName="Header-active-nav"
+                to="/contract-form" >
+                Form
+              </NavLink>
+            </div>
+          </div>
         </header>
       </div>
     )
@@ -22,7 +49,9 @@ class Header extends Component {
 }
 
 Header.propTypes = {
-  version: PropTypes.string,
+  web3Injected: PropTypes.bool,
+  setCanvas: PropTypes.func,
+  canvasComponent: PropTypes.string,
 }
 
 export default Header
