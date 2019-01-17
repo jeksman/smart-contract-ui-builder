@@ -10,7 +10,7 @@
     "eject": "react-scripts eject"
   },
   "repository": {
-    "type": "git",
+    "type": "git"
   },
   "keywords": [
     "Ethereum",
