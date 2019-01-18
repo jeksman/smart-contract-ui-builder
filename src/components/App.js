@@ -7,8 +7,6 @@ import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom'
 import ContractForm from './ContractForm'
 import Grapher from './Grapher'
 import Header from './Header'
-import ResourceMenu from './ResourceMenu'
-
 import './style/App.css'
 
 import { logRenderError } from '../redux/reducers/renderErrors'
@@ -26,8 +24,12 @@ class App extends Component {
   //   console.log(nextProps)
   // }
 
+  componentDidMount () {
+
+  }
+
   componentDidCatch (error, errorInfo) {
-    // Catch errors in any components below and re-render with error message
+    // Catch errors in any components below and, in the future, re-render with error message
     this.props.logRenderError(error, errorInfo)
   }
 
@@ -39,8 +41,8 @@ class App extends Component {
           <div>
             <Header
               web3Injected={!!this.props.web3}
+              contractInstances={this.props.contractInstances}
             />
-            <ResourceMenu />
             <div className="App-canvas-container">
               <Switch>
                 <Route exact path="/" render={ () => (
@@ -80,15 +82,18 @@ App.propTypes = {
   graph: PropTypes.object,
   deployer: PropTypes.object,
   deploy: PropTypes.func,
+  contractInstances: PropTypes.object,
 }
 
 function mapStateToProps (state) {
   return {
+    // contracts
+    deployer: state.contracts.deployer,
+    contractInstances: state.contracts.instances,
     // grapher
     graph: state.grapher.selectedGraph,
     // web3
     web3: state.web3.injected,
-    deployer: state.web3.deployer,
   }
 }
 
@@ -98,8 +103,9 @@ function mapDispatchToProps (dispatch) {
     logRenderError: (error, errorInfo) => dispatch(logRenderError(error, errorInfo)),
     // web3
     getWeb3: () => dispatch(getWeb3()),
-    deploy: (contractName, constructorParams) =>
-      dispatch(deploy(contractName, constructorParams)),
+    // contracts
+    deploy: (deployer, contractName, constructorParams) =>
+      dispatch(deploy(deployer, contractName, constructorParams)),
   }
 }
 

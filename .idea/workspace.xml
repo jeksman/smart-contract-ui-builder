@@ -4,9 +4,10 @@
     <list default="true" id="5a771b51-a307-461e-a119-49a96d08f91e" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/src/components/App.js" afterPath="$PROJECT_DIR$/src/components/App.js" />
+      <change beforePath="$PROJECT_DIR$/src/components/Header.js" afterPath="$PROJECT_DIR$/src/components/Header.js" />
+      <change beforePath="$PROJECT_DIR$/src/components/ResourceMenu.js" afterPath="" />
       <change beforePath="$PROJECT_DIR$/src/components/style/Header.css" afterPath="$PROJECT_DIR$/src/components/style/Header.css" />
-      <change beforePath="$PROJECT_DIR$/src/graphing/graphTemplate.js" afterPath="$PROJECT_DIR$/src/graphing/graphTemplate.js" />
-      <change beforePath="$PROJECT_DIR$/src/redux/configureStore.js" afterPath="$PROJECT_DIR$/src/redux/configureStore.js" />
+      <change beforePath="$PROJECT_DIR$/src/components/style/ResourceMenu.css" afterPath="" />
       <change beforePath="$PROJECT_DIR$/src/redux/enhancers/localstorage/persistState.js" afterPath="$PROJECT_DIR$/src/redux/enhancers/localstorage/persistState.js" />
       <change beforePath="$PROJECT_DIR$/src/redux/reducers/contracts.js" afterPath="$PROJECT_DIR$/src/redux/reducers/contracts.js" />
     </list>
@@ -45,7 +46,7 @@
         <entry file="file://$PROJECT_DIR$/src/redux/reducers/contracts.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="403">
-              <caret line="174" column="0" lean-forward="false" selection-start-line="174" selection-start-column="0" selection-end-line="174" selection-end-column="0" />
+              <caret line="172" column="0" lean-forward="false" selection-start-line="172" selection-start-column="0" selection-end-line="172" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -350,7 +351,7 @@
       <option name="presentableId" value="Default" />
       <updated>1547632775780</updated>
       <workItem from="1547632777524" duration="802000" />
-      <workItem from="1547633844931" duration="9531000" />
+      <workItem from="1547633844931" duration="9660000" />
     </task>
     <task id="LOCAL-00001" summary="add react-router-dom, add basic dynamic form generations. minor refactoring">
       <created>1547717914471</created>
@@ -387,11 +388,18 @@
       <option name="project" value="LOCAL" />
       <updated>1547804590437</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="listen for account/network changes, add resource menu component">
+      <created>1547804742483</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1547804742483</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="10333000" />
+    <option name="totallyTimeSpent" value="10462000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -404,7 +412,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="428" y="23" width="1440" height="810" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32867134" sideWeight="0.49713877" order="6" side_tool="false" content_ui="tabs" />
@@ -415,7 +422,7 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32867134" sideWeight="0.4828326" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32867134" sideWeight="0.47424892" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32867134" sideWeight="0.47424892" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2532189" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -473,7 +480,8 @@
     <MESSAGE value="add persistent local storage of deployed contracts" />
     <MESSAGE value="minor edits to localStorage enchancers" />
     <MESSAGE value="refactor how state property exclusion (declare in reducers)" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor how state property exclusion (declare in reducers)" />
+    <MESSAGE value="listen for account/network changes, add resource menu component" />
+    <option name="LAST_COMMIT_MESSAGE" value="listen for account/network changes, add resource menu component" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -580,7 +588,7 @@
         <state relative-caret-position="-92">
           <caret line="36" column="15" lean-forward="false" selection-start-line="36" selection-start-column="15" selection-end-line="36" selection-end-column="15" />
           <folding>
-            <marker date="1547804607350" expanded="true" signature="2998:3004" ph="//..." />
+            <marker date="1547804766754" expanded="true" signature="3184:3190" ph="//..." />
           </folding>
         </state>
       </provider>
@@ -784,7 +792,7 @@
     <entry file="file://$PROJECT_DIR$/src/redux/reducers/contracts.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="403">
-          <caret line="174" column="0" lean-forward="false" selection-start-line="174" selection-start-column="0" selection-end-line="174" selection-end-column="0" />
+          <caret line="172" column="0" lean-forward="false" selection-start-line="172" selection-start-column="0" selection-end-line="172" selection-end-column="0" />
           <folding />
         </state>
       </provider>
