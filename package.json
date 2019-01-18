@@ -1,5 +1,5 @@
 {
-  "name": "smart-comtract-ui-builder",
+  "name": "smart-contract-ui-builder",
   "version": "0.0.0",
   "description": "Takes one or several smart contracts as inputs and represents their relationships as a graph",
   "private": true,
@@ -25,7 +25,6 @@
   ],
   "author": "Eugene Kyselev <admin@profsite.com.ua>",
   "license": "MIT",
-
   "dependencies": {
     "bootstrap": "^3.3.7",
     "chain-end": "^0.2.0",
@@ -40,7 +39,6 @@
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.4",
     "redux": "^4.0.0",
-    "redux-localstorage": "^0.4.1",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
     "web3": "^1.0.0-beta.34"
