@@ -3,11 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="5a771b51-a307-461e-a119-49a96d08f91e" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/src/redux/enhancers/localstorage/createSlicer.js" afterPath="$PROJECT_DIR$/src/redux/enhancers/localstorage/createSlicer.js" />
-      <change beforePath="$PROJECT_DIR$/src/redux/enhancers/localstorage/getSubset.js" afterPath="$PROJECT_DIR$/src/redux/enhancers/localstorage/getSubset.js" />
-      <change beforePath="$PROJECT_DIR$/src/redux/enhancers/localstorage/persistState.js" afterPath="$PROJECT_DIR$/src/redux/enhancers/localstorage/persistState.js" />
-      <change beforePath="$PROJECT_DIR$/src/redux/enhancers/localstorage/util/mergeState.js" afterPath="$PROJECT_DIR$/src/redux/enhancers/localstorage/util/mergeState.js" />
-      <change beforePath="$PROJECT_DIR$/src/redux/enhancers/localstorage/util/typeOf.js" afterPath="$PROJECT_DIR$/src/redux/enhancers/localstorage/util/typeOf.js" />
+      <change beforePath="$PROJECT_DIR$/src/redux/reducers/contracts.js" afterPath="$PROJECT_DIR$/src/redux/reducers/contracts.js" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -18,7 +14,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="package.json" pinned="false" current-in-tab="true">
+      <file leaf-file-name="package.json" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/package.json">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="330">
@@ -40,11 +36,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="contracts.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="contracts.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/redux/reducers/contracts.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="93">
-              <caret line="109" column="45" lean-forward="false" selection-start-line="109" selection-start-column="45" selection-end-line="109" selection-end-column="45" />
+            <state relative-caret-position="403">
+              <caret line="172" column="0" lean-forward="false" selection-start-line="172" selection-start-column="0" selection-end-line="172" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -126,8 +122,8 @@
         <option value="$PROJECT_DIR$/LICENSE" />
         <option value="$PROJECT_DIR$/src/parser.js" />
         <option value="$PROJECT_DIR$/package-lock.json" />
-        <option value="$PROJECT_DIR$/src/redux/reducers/contracts.js" />
         <option value="$PROJECT_DIR$/package.json" />
+        <option value="$PROJECT_DIR$/src/redux/reducers/contracts.js" />
       </list>
     </option>
   </component>
@@ -141,7 +137,7 @@
     <handled-path value="$PROJECT_DIR$/node_modules" />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="249" />
+    <option name="x" value="428" />
     <option name="y" value="23" />
     <option name="width" value="1440" />
     <option name="height" value="810" />
@@ -349,7 +345,7 @@
       <option name="presentableId" value="Default" />
       <updated>1547632775780</updated>
       <workItem from="1547632777524" duration="802000" />
-      <workItem from="1547633844931" duration="9332000" />
+      <workItem from="1547633844931" duration="9396000" />
     </task>
     <task id="LOCAL-00001" summary="add react-router-dom, add basic dynamic form generations. minor refactoring">
       <created>1547717914471</created>
@@ -372,11 +368,18 @@
       <option name="project" value="LOCAL" />
       <updated>1547804425047</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="minor edits to localStorage enchancers">
+      <created>1547804521979</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1547804521979</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="10134000" />
+    <option name="totallyTimeSpent" value="10198000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -388,7 +391,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="249" y="23" width="1440" height="810" extended-state="0" />
+    <frame x="428" y="23" width="1440" height="810" extended-state="0" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32867134" sideWeight="0.49713877" order="6" side_tool="false" content_ui="tabs" />
@@ -455,7 +458,8 @@
     <MESSAGE value="add react-router-dom, add basic dynamic form generations. minor refactoring" />
     <MESSAGE value="missing files push" />
     <MESSAGE value="add persistent local storage of deployed contracts" />
-    <option name="LAST_COMMIT_MESSAGE" value="add persistent local storage of deployed contracts" />
+    <MESSAGE value="minor edits to localStorage enchancers" />
+    <option name="LAST_COMMIT_MESSAGE" value="minor edits to localStorage enchancers" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -747,14 +751,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/redux/reducers/contracts.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="93">
-          <caret line="109" column="45" lean-forward="false" selection-start-line="109" selection-start-column="45" selection-end-line="109" selection-end-column="45" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/redux/reducers/grapher.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -775,6 +771,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="330">
           <caret line="22" column="16" lean-forward="false" selection-start-line="22" selection-start-column="16" selection-end-line="22" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/redux/reducers/contracts.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="403">
+          <caret line="172" column="0" lean-forward="false" selection-start-line="172" selection-start-column="0" selection-end-line="172" selection-end-column="0" />
           <folding />
         </state>
       </provider>
