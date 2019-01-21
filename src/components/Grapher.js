@@ -5,9 +5,20 @@ import joint from 'jointjs'
 import svgPanZoom from 'svg-pan-zoom'
 import uuid from 'uuid/v4'
 
-import { contractGraphTypes } from '../graphing/graphGenerator'
-import jh from '../graphing/jointHelper'
 import { grapherModes } from '../redux/reducers/grapher'
+
+import { graphTypes } from '../graphing/graphGenerator'
+
+import {
+  initializeJointPaper,
+  setJointElements,
+} from '../graphing/jointHelper'
+
+/**
+ * TODO
+ * There's a significant amount of application logic in this component that
+ * should be moved to redux thunks if possible
+ */
 
 export default class Grapher extends Component {
 
@@ -35,7 +46,7 @@ export default class Grapher extends Component {
       width = container.current.clientWidth
 
     } else {
-      // arbitrary non-zero values
+      // arbitrary non-zero values to prevent CSS/rendering weirdness
       height = 1
       width = 1
     }
@@ -60,15 +71,23 @@ export default class Grapher extends Component {
 
       this.state.jointGraph.clear()
 
-      if (this.props.selectedGraph) {
+      if (this.props.displayGraph) {
 
-        jh.addJointElements(
-          this.state.jointGraph, this.props.selectedGraph, { setsLayout: true }
+        const meta = { setsLayout: true }
+
+        if (this.props.displayGraph.type === graphTypes.contract.functions) {
+          meta.layoutOptions = {}
+          meta.layoutOptions.rankDir = 'TB'
+        }
+
+        setJointElements(
+          this.state.jointGraph,
+          this.props.displayGraph,
+          meta
         )
       }
 
       if (this.state.svgPanZoom) this.state.svgPanZoom.reset()
-
     } else if (this.props.grapherMode === grapherModes.createDapp) {
 
       // if this condition is true,
@@ -79,16 +98,17 @@ export default class Grapher extends Component {
         delete wipGraph.id
         // absence of id used to indicate that user cannot save the wipGraph
         // see ResourceMenu prop, hasWipGraph
+        // TODO: make this dependent on grapherMode instead
 
         this.state.jointGraph.clear()
 
-        jh.addJointElements(
+        setJointElements(
           this.state.jointGraph,
           wipGraph,
-          { setsLayout: true }
+          { setsLayout: false }
         )
 
-        wipGraph.type = 'dapp'
+        wipGraph.type = graphTypes.dapp.template
 
         this.props.storeWipGraph(wipGraph)
       }
@@ -98,7 +118,7 @@ export default class Grapher extends Component {
   // initialize jointGraph on mount
   componentDidMount () {
 
-    const paper = jh.paper.initialize(
+    const paper = initializeJointPaper(
       this.jointElement,
       this.state.jointGraph,
       {
@@ -128,7 +148,7 @@ export default class Grapher extends Component {
       this.setState({
         svgPanZoom: svgPanZoom(this.jointElement.childNodes[2], {
           beforePan: (oldPan, newPan) => {
-            if (this.state.jointPaper._dappGrapher.panning) return true
+            if (this.state.jointPaper.dappGrapher.panning) return true
             return false
           },
           dblClickZoomEnabled: false,
@@ -142,7 +162,7 @@ export default class Grapher extends Component {
     }
 
     // if selected graph has changed, run set workflow
-    if (prevProps.selectedGraph !== this.props.selectedGraph) {
+    if (prevProps.displayGraph !== this.props.displayGraph) {
       this.setJointGraph()
     }
 
@@ -175,27 +195,32 @@ export default class Grapher extends Component {
     )
   }
 
+  /**
+   * Inserts insertionGraph elements into wipGraph and saves wipGraph to store
+   */
   updateWipGraph = () => {
 
     if (!this.props.wipGraph) return
 
     const wipGraph = { ...this.props.wipGraph }
 
+    // set wipGraph id if missing
     if (!wipGraph.id) wipGraph.id = uuid()
 
+    // each contract added to wipGraph must be uniquely identified
     const contractId = uuid()
     const insertionGraph = { ...this.props.insertionGraph }
     insertionGraph.id = contractId + ':graph'
 
-    if (!wipGraph.contracts[insertionGraph.name]) {
-      wipGraph.contracts[insertionGraph.name] = []
-    }
+    // contracts of wipGraph are stored in array by contract type/name
+    wipGraph.contracts[insertionGraph.name]
+    ? wipGraph.contracts[insertionGraph.name].push(contractId)
+    : wipGraph.contracts[insertionGraph.name] = [contractId]
 
-    wipGraph.contracts[insertionGraph.name].push(contractId)
-
+    // add nodes of insertionGraph to wipGraph
     Object.values(insertionGraph.elements.nodes).forEach(node => {
 
-      if (Object.values(contractGraphTypes).includes(node.type)) {
+      if (Object.values(graphTypes.contract).includes(node.type)) {
         node.id = contractId
       } else if (node.abiName) {
         node.id = contractId + ':' + node.abiName
@@ -208,12 +233,14 @@ export default class Grapher extends Component {
       wipGraph.elements.nodes[node.id] = node
     })
 
+    // add edges of insertionGraph to wipGraph
     Object.values(insertionGraph.elements.edges).forEach(edge => {
       edge.id = contractId + ':' + edge.id
       wipGraph.elements.edges[edge.id] = edge
     })
 
-    jh.addJointElements(
+    // add insertionGraph elements to joint
+    setJointElements(
       this.state.jointGraph,
       insertionGraph,
       { setsLayout: false }
@@ -227,22 +254,55 @@ export default class Grapher extends Component {
    */
 
   /**
-  * Opens form per Joint state and grapherMode.
+  * Opens modal with ContractForm per Joint state and grapherMode.
   * Pass to Joint paper at initialization.
   */
-  openForm = functionId => {
+  openForm = (functionId, contractName = null, instanceAddress = null) => {
 
     if (this.props.grapherMode === grapherModes.main) {
 
-      if (functionId) this.props.selectContractFunction(functionId)
+      if (
+        this.props.displayGraph.type === graphTypes.dapp.deployed &&
+        instanceAddress
+      ) {
+
+        // TODO 9/3
+        // Run the get graph workflow for the graph associated with
+        // instanceAddress, then call some other thunk (selectFormGraph probably)
+        // that will ensure the modal opens with the correct content
+        this.props.selectFormGraph(contractName, instanceAddress)
+
+      } else if (
+        this.props.displayGraph.type === graphTypes.dapp.deployed ||
+        instanceAddress
+      ) {
+        throw new Error(
+          'unhandled workflow: graph type ' + this.props.displayGraph.type +
+          ' and instanceAddress ' + Boolean(instanceAddress)
+        )
+      }
+
+      if (
+        functionId &&
+        this.props.displayGraph.type !== graphTypes.dapp.deployed
+      ) {
+        this.props.selectContractFunction(functionId)
+      }
 
       this.props.openContractForm()
+
     } else if (this.props.grapherMode === grapherModes.createDapp) {
       // do nothing for now
+      // TODO: do something here? Currently when creating a dapp,
+      // all you do is wire the individual nodes together and we don't
+      // want a form to open.
     }
   }
 
-
+  /**
+   * Adds an edge to the current wipGraph and saves the wipGraph to store
+   * @param  {object}  edge  the edge to be added
+   */
   addWipGraphEdge = edge => {
 
     const wipGraph = { ...this.props.wipGraph }
@@ -271,6 +331,7 @@ export default class Grapher extends Component {
       } else break
     }
 
+    // TODO: why are these deleted?
     delete edge.sourceName
     delete edge.targetName
 
@@ -279,6 +340,10 @@ export default class Grapher extends Component {
     this.props.storeWipGraph(wipGraph)
   }
 
+  /**
+   * Removes an edge from the wipGraph and saves the wipGraph to store
+   * @param  {string} edgeId the id of the edge to be deleted
+   */
   removeWipGraphEdge = edgeId => {
 
     const wipGraph = { ...this.props.wipGraph }
@@ -298,8 +363,9 @@ Grapher.propTypes = {
   insertionGraphId: PropTypes.string,
   openContractForm: PropTypes.func,
   selectContractFunction: PropTypes.func,
-  selectedGraph: PropTypes.object,
-  selectedGraphId: PropTypes.string,
+  displayGraph: PropTypes.object,
+  displayGraphId: PropTypes.string,
   storeWipGraph: PropTypes.func,
   wipGraph: PropTypes.object,
+  selectFormGraph: PropTypes.func,
 }

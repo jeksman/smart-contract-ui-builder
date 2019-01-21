@@ -5,11 +5,18 @@ import { withStyles } from '@material-ui/core/styles'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
+import { CopyToClipboard } from 'react-copy-to-clipboard'
 
 import DropdownMenu from './common/DropdownMenu'
-import { contractGraphTypes } from '../graphing/graphGenerator'
 
-import './style/ContractForm.css'
+import { graphTypes } from '../graphing/graphGenerator'
+import { getDisplayAddress } from '../utils'
+
+/**
+ * TODO
+ * There's a significant amount of application logic in this component that
+ * should be moved to redux thunks if possible
+ */
 
 const styles = theme => ({
   container: {
@@ -39,8 +46,9 @@ class ContractForm extends Component {
 
   componentDidMount () {
 
+    // dapp field values are stored in state, but not individual contracts
     if (
-      this.props.selectedGraph.type === 'dapp' &&
+      Object.values(graphTypes.dapp).includes(this.props.graph.type) &&
       Object.keys(this.props.fieldValues).length > 0
     ) {
       this.setState({ fieldValues: this.props.fieldValues })
@@ -49,7 +57,11 @@ class ContractForm extends Component {
 
   componentWillUnmount () {
 
-    if (this.props.selectedGraph.type === 'dapp') {
+    // dapp field values are stored in state, but not individual contracts
+    if (
+      Object.values(graphTypes.dapp).includes(this.props.graph.type) &&
+      Object.keys(this.state.fieldValues).length > 0
+    ) {
       this.props.storeFieldValues(this.state.fieldValues)
     }
   }
@@ -59,26 +71,65 @@ class ContractForm extends Component {
     const { classes } = this.props
 
     return (
-      <div className="ContractForm-formContainer">
+      <Fragment>
         <Typography
           className={classes.nested}
           variant="title"
           id="modal-title"
         >
-          {this.props.heading ? this.props.heading : ''}
+          {this.props.heading}
         </Typography>
-        {
-          this.props.subHeading
-          ?
-            (
-              <Typography variant="subheading" id="simple-modal-description">
-                {this.props.subHeading}
-              </Typography>
-            )
-          : ''
-        }
+        {this.getSubheading()}
         {this.getFunctionForm()}
-      </div>
+      </Fragment>
+    )
+  }
+
+  getSubheading = () => {
+
+    let type
+
+    if (this.props.selectedContractFunction) {
+      type =
+        this.props.graph.elements
+        .nodes[this.props.selectedContractFunction].type
+    } else {
+      type = this.props.graph.type
+    }
+
+    const typography = (
+      <Typography
+          className={this.props.classes.nested}
+          id="simple-modal-description"
+          variant="subheading"
+        >
+        {
+          this.props.contractAddress
+          ? getDisplayAddress(this.props.contractAddress)
+          : type === graphTypes.contract._constructor
+            ? 'Constructor'
+            : 'Deployed'
+        }
+      </Typography>
+    )
+
+    return (
+      this.props.contractAddress
+      ? <CopyToClipboard
+          text={this.props.contractAddress}
+          onCopy={this.handleCopy}
+          style={{ cursor: 'pointer', flexShrink: 1 }}
+        >
+          {typography}
+        </CopyToClipboard>
+      : typography
+    )
+  }
+
+  handleCopy = () => {
+    this.props.addSnackbarNotification(
+      'Contract address copied to clipboard!',
+      2000
     )
   }
 
@@ -111,6 +162,7 @@ class ContractForm extends Component {
     )
 
     this.setState({ fieldValues: {} })
+    this.props.closeContractForm()
   }
 
   handleConstructorSubmit = metaData => event => {
@@ -118,7 +170,7 @@ class ContractForm extends Component {
     event.preventDefault()
 
     this.props.deployContract(
-      this.props.selectedGraph.name,
+      this.props.graph.name,
       metaData.paramOrder.map(id => {
         return this.state.fieldValues[id]
       })
@@ -138,9 +190,12 @@ class ContractForm extends Component {
       ),
     }
 
+    // TODO: application logic
     wipDeployment[metaData.id] = {
+      nodeId: metaData.id,
       contractName: metaData.abiName,
-      deploymentOrder: this.props.dappTemplate.deployments[metaData.id].deploymentOrder,
+      deploymentOrder:
+        this.props.dappTemplate.contractNodes[metaData.id].deploymentOrder,
       params: {
         ...metaData.params,
       },
@@ -151,7 +206,7 @@ class ContractForm extends Component {
 
     Object.values(wipDeployment[metaData.id].params).forEach(param => {
 
-      if (param.source) { // this parameter is a target
+      if (param.source) { // this parameter is an edge target
 
         if (param.sourceParent === 'account') {
           param.value = this.props.account
@@ -163,17 +218,18 @@ class ContractForm extends Component {
 
     Object.values(wipDeployment[metaData.id].outputs).forEach(output => {
 
-      if (output.target) {
+      if (output.target) { // this parameter is an edge source
 
-        if (!wipDeployment[metaData.id].children) {
-          wipDeployment[metaData.id].children = []
+        if (!wipDeployment[metaData.id].childParams) {
+          wipDeployment[metaData.id].childParams = []
         }
 
-        wipDeployment[metaData.id].children.push({
+        wipDeployment[metaData.id].childParams.push({
           type: 'address',
-          param: output.target,
-          paramParent: output.targetParent,
-          deploymentOrder: this.props.dappTemplate.deployments[output.targetParent].deploymentOrder,
+          paramId: output.target,
+          contractId: output.targetParent,
+          deploymentOrder:
+            this.props.dappTemplate.contractNodes[output.targetParent].deploymentOrder,
         })
       }
     })
@@ -185,53 +241,43 @@ class ContractForm extends Component {
   getFunctionForm = () => {
 
     const { classes } = this.props
-    const nodes = this.props.selectedGraph.elements.nodes
-    const graphType = this.props.selectedGraph.type
-    const selectedNodeId = this.props.selectedContractFunction
-    const selectedNode = nodes[selectedNodeId]
 
-    let formData; let submitHandler; let functionCall = false
+    const nodes = this.props.graph.elements.nodes
+    const graphType = this.props.graph.type
+    // const selectedNode = nodes[this.props.selectedContractFunction]
+
+    const formData = this.getFunctionFormData()
+
+    let submitHandler; let functionCall = false
 
     switch (graphType) {
 
-      case contractGraphTypes._constructor:
+      case graphTypes.contract._constructor:
 
-        formData = this.getFunctionFormFields()
         submitHandler = this.handleConstructorSubmit
 
         break
 
-      case contractGraphTypes.functions:
+      case graphTypes.contract.functions:
 
         functionCall = true
 
-        // here, a function is only selected if selected by user from
-        // DropdownMenu component in form (see below)
-        if (this.props.selectedContractFunction) {
-
-          formData = this.getFunctionFormFields()
-          submitHandler = this.handleFunctionSubmit
-        }
+        submitHandler = this.handleFunctionSubmit
 
         break
 
-      case 'dapp':
+      case graphTypes.dapp.template:
 
         // in the case of a dapp, a function id is selected in Grapher,
         // by an event handler in the Joint paper and passed to
         // this.props.selectedContractFunction
 
-        if (selectedNode.type === contractGraphTypes.functions) {
-          functionCall = true
-        }
-
-        formData = this.getFunctionFormFields()
         submitHandler = this.handleDappFunctionSubmit
 
         break
 
       default:
-        throw new Error('unhandled graph type')
+        throw new Error('unhandled graph type: ' + graphType)
     }
 
     return (
@@ -253,23 +299,36 @@ class ContractForm extends Component {
                 className={classes.container}
                 onSubmit={submitHandler(formData.metaData)}
               >
-                <div className="ContractForm-fields">
+                <div className={classes.nested}>
                   {formData.fields}
                 </div>
-                <div className="ContractForm-button">
-                  <Button
-                    className={classes.button}
-                    variant="contained"
-                    type="submit"
-                  >
-                    {
-                      graphType === 'dapp'
-                      ? 'Submit'
-                      : functionCall
-                        ? 'Call Function'
-                        : 'Deploy'
-                    }
-                  </Button>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'flex-end',
+                  }}
+                >
+                  {
+                    !(
+                      functionCall &&
+                      !this.props.selectedContractFunction
+                    )
+                    ? <Button
+                        className={classes.button}
+                        variant="contained"
+                        type="submit"
+                      >
+                        {
+                          graphType === graphTypes.dapp.template
+                          ? 'Save Inputs'
+                          : functionCall
+                            ? 'Call Function'
+                            : 'Deploy'
+                        }
+                      </Button>
+                    : null
+                  }
                 </div>
               </form>
             )
@@ -279,10 +338,10 @@ class ContractForm extends Component {
     )
   }
 
-  getFunctionFormFields = () => {
+  getFunctionFormData = () => {
 
-    const nodes = this.props.selectedGraph.elements.nodes
-    const edges = this.props.selectedGraph.elements.edges
+    const nodes = this.props.graph.elements.nodes
+    const edges = this.props.graph.elements.edges
     const functionId = this.props.selectedContractFunction
     const functionNodes = []
 
@@ -302,7 +361,7 @@ class ContractForm extends Component {
     functionNodes.forEach(node => {
 
       if (
-        Object.values(contractGraphTypes).includes(node.type) ||
+        Object.values(graphTypes.contract).includes(node.type) ||
         node.type === 'function'
       ) {
 
@@ -337,6 +396,7 @@ class ContractForm extends Component {
 
         switch (fieldType) {
 
+          // TODO: handle different parameter types
           // case 'string':
           default:
             fields.push(
@@ -378,7 +438,10 @@ class ContractForm extends Component {
     })
 
     fields.sort((a, b) => {
-      return metaData.params[a.props.id].paramOrder - metaData.params[b.props.id].paramOrder
+      return (
+        metaData.params[a.props.id].paramOrder -
+        metaData.params[b.props.id].paramOrder
+      )
     })
     metaData.paramOrder.sort((a, b) => {
       return metaData.params[a].paramOrder - metaData.params[b].paramOrder
@@ -411,13 +474,13 @@ ContractForm.propTypes = {
   selectContractFunction: PropTypes.func,
   selectedContractFunction: PropTypes.string,
   heading: PropTypes.string,
-  subHeading: PropTypes.string,
-  selectedGraph: PropTypes.object,
+  graph: PropTypes.object,
   updateWipDappDeployment: PropTypes.func,
   dappTemplate: PropTypes.object,
   wipDappDeployment: PropTypes.object,
   fieldValues: PropTypes.object,
   storeFieldValues: PropTypes.func,
+  addSnackbarNotification: PropTypes.func,
 }
 
 /**

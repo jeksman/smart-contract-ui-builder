@@ -13,7 +13,7 @@ import CloudQueueIcon from '@material-ui/icons/CloudQueue'
 import NestedList from './common/NestedList'
 import ListButton from './common/ListButton'
 
-// import { contractGraphTypes } from '../graphing/graphGenerator'
+// import { graphTypes } from '../graphing/graphGenerator'
 import { grapherModes } from '../redux/reducers/grapher'
 import { spacingUnit } from '../withMuiRoot'
 
@@ -53,7 +53,7 @@ class DappResourceList extends Component {
 
   handleDeployNewClick = (templateId, graphId) => {
     this.props.selectTemplate(templateId)
-    this.props.selectGraph(graphId)
+    this.props.selectDisplayGraph(graphId)
   }
 
   handleDeployedClick = (templateId, deployedId) => {
@@ -61,7 +61,7 @@ class DappResourceList extends Component {
     if (this.props.selectedTemplateId !== templateId) {
       this.props.selectTemplate(templateId)
     }
-    this.props.selectDeployed(deployedId)
+    this.props.selectDeployed(templateId, deployedId)
   }
 
   getTemplateListItems = dapps => {
@@ -78,7 +78,7 @@ class DappResourceList extends Component {
         <NestedList
           key={id}
           icon={(<ExtensionIcon />)}
-          displayText={dapps[id].name}
+          displayText={dapps[id].displayName}
           buttonPadding={spacingUnit * 4}
         >
           <ListButton
@@ -118,7 +118,8 @@ class DappResourceList extends Component {
           displayText={item.displayName}
           inset={true}
           primaryTypographyProps={{ noWrap: true }}
-          onClick={() => this.handleDeployedClick(templateId, item.id)} />
+          onClick={() => this.handleDeployedClick(templateId, item.id)}
+          toolTip={item.displayName} />
       )
     })
   }
@@ -128,7 +129,7 @@ DappResourceList.propTypes = {
   // classes: PropTypes.object.isRequired,
   dapps: PropTypes.object.isRequired,
   setGrapherMode: PropTypes.func,
-  selectGraph: PropTypes.func,
+  selectDisplayGraph: PropTypes.func,
   selectTemplate: PropTypes.func,
   selectDeployed: PropTypes.func,
   selectedDeployedId: PropTypes.string,

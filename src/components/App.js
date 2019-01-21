@@ -18,11 +18,14 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 
 // Custom component imports
 
-import AppModal from './common/AppModal'
 import ContractForm from './ContractForm'
+import DappForm from './DappForm'
 import Grapher from './Grapher'
 import Header from './Header'
+import Modal from './common/AppModal'
 import ResourceMenu from './ResourceMenu'
+import Snackbar from './common/AppSnackbar'
+
 import withMuiRoot from '../withMuiRoot'
 
 // Reducer imports
@@ -36,6 +39,7 @@ import {
 } from '../redux/reducers/contracts'
 
 import {
+  addDappTemplate,
   deployDapp,
   selectDappTemplate,
   updateWipDeployment,
@@ -45,23 +49,24 @@ import {
 import {
   grapherModes,
   setGrapherMode,
+  getGraph,
   createGraph,
   deleteGraph,
   deleteAllGraphs,
-  getCreateGraphParams,
-  selectGraph,
-  saveWipGraph,
+  selectFormGraph,
+  selectDisplayGraph,
   updateWipGraph,
 } from '../redux/reducers/grapher'
 
 import { logRenderError } from '../redux/reducers/renderErrors'
 
 import {
-  closeAppModal,
-  openAppModal,
+  addSnackbarNotification,
+  closeModal,
+  openModal,
+  modalContentTypes,
   selectContractFunction,
-  saveContractFormFieldValues,
-  deleteContractFormFieldValues,
+  saveModalFormFieldValues,
 } from '../redux/reducers/ui'
 
 import { getWeb3 } from '../redux/reducers/web3'
@@ -73,66 +78,58 @@ import appStyles from './style/App.style'
 
 class App extends Component {
 
+  /**
+   * Dispatches getWeb3 action, sets ref for the graph container element,
+   * sets necessary component-level ui state
+   */
   constructor (props) {
+
     super(props)
+
     this.props.getWeb3()
+
     this.graphContainerRef = React.createRef()
+
     this.state = {
-      drawerOpen: true,
-      graphHeight: null,
-      graphWidth: null,
-      selectedGraph: null,
-      insertionGraph: null,
+      drawerOpen: true, // left sidebar open by default
     }
   }
 
+  /**
+   * Handles opening the left sidebar
+   */
   handleDrawerOpen = () => {
     this.setState({ drawerOpen: true })
   }
 
+  /**
+   * Handles closing the left sidebar
+   */
   handleDrawerClose = () => {
     this.setState({ drawerOpen: false })
   }
 
+  /**
+   * Perfunctory React render error handling
+   * Is called automagically be React on render errors
+   */
   componentDidCatch (error, errorInfo) {
-    // Catch errors in any components below and, in the future,
+    // Catch errors in any child components and, in the future,
     // re-render with error message
     this.props.logRenderError(error, errorInfo)
-  }
-
-  componentDidUpdate () {
-
-    let selectedGraph = null
-
-    // conversion from immutable data
-    if (this.props.selectedGraphObject) {
-      selectedGraph = this.props.selectedGraphObject.toJS()
-    }
-
-    // delete Contract Form field values from store if the selected
-    // graph's type is a dapp and there are field values to delete
-    if (
-      (!selectedGraph || selectedGraph.type !== 'dapp') &&
-      (
-        Boolean(this.props.contractFormFieldValues) &&
-        Object.keys(this.props.contractFormFieldValues).length > 0
-      )
-    ) {
-      this.props.deleteContractFormFieldValues()
-    }
   }
 
   render () {
 
     const classes = this.props.classes
 
-    let selectedGraph = null
+    let displayGraph = null
     let insertionGraph = null
 
     // conversion from immutable data
-    if (this.props.selectedGraphObject) {
+    if (this.props.displayGraphObject) {
 
-      selectedGraph = this.props.selectedGraphObject.toJS()
+      displayGraph = this.props.displayGraphObject.toJS()
 
     } else if (this.props.insertionGraphObject) {
 
@@ -142,7 +139,7 @@ class App extends Component {
     return (
       <Fragment>
         <CssBaseline />
-        <div className={'App ' + classes.root} >
+        <div className={classes.root} >
           <AppBar
             position="absolute"
             className={classNames(
@@ -175,7 +172,7 @@ class App extends Component {
               </Typography>
               <Header
                 classes={classes}
-                web3Injected={!!this.props.web3}
+                web3Injected={Boolean(this.props.account)}
               />
             </Toolbar>
           </AppBar>
@@ -186,6 +183,9 @@ class App extends Component {
               paper: classNames(
                 classes.drawerPaper,
                 !this.state.drawerOpen && classes.drawerPaperClose
+              ),
+              docked: classNames(
+                this.state.drawerOpen && classes.undocked,
               ),
             }}
             open={this.state.drawerOpen}
@@ -202,37 +202,40 @@ class App extends Component {
                 setGrapherMode={this.props.setGrapherMode}
                 drawerOpen={this.state.drawerOpen}
                 account={this.props.account}
+                addContractType={this.props.addContractType}
                 addInstance={this.props.addInstance}
                 networkId={this.props.networkId}
                 contractTypes={this.props.contractTypes}
                 contractInstances={this.props.contractInstances}
                 createGraph={this.props.createGraph}
-                getCreateGraphParams={getCreateGraphParams} // helper, not dispatch
                 deleteGraph={this.props.deleteGraph}
                 deleteAllGraphs={this.props.deleteAllGraphs}
-                selectGraph={this.props.selectGraph}
-                selectedGraphId={this.props.selectedGraphId}
+                selectDisplayGraph={this.props.selectDisplayGraph}
+                displayGraphId={this.props.displayGraphId}
                 selectContractAddress={this.props.selectContractAddress}
                 selectedContractAddress={this.props.selectedContractAddress}
                 hasGraphs={this.props.hasGraphs}
                 dapps={this.props.dapps}
                 insertionGraphId={this.props.insertionGraphId}
-                saveWipGraph={this.props.saveWipGraph}
                 hasWipGraph={
                   this.props.wipGraph
-                  ? Boolean(this.props.wipGraph.id)
+                  ? Boolean(this.props.wipGraph.id) // TODO: make dependent on grapherMode instead
                   : false
                 }
                 selectDappTemplate={this.props.selectDappTemplate}
                 selectedDappTemplateId={this.props.selectedDappTemplateId}
                 hasWipDeployment={Boolean(this.props.wipDappDeployment)}
-                deployDapp={this.props.deployDapp}
+                openDappForm={
+                  () => this.props.openModal(modalContentTypes.dappForm)
+                }
                 selectDeployedDapp={this.props.selectDeployedDapp}
-                selectedDeployedDappId={this.props.selectedDeployedDappId} />
+                selectedDeployedDappId={this.props.selectedDeployedDappId}
+                openModal={this.props.openModal}
+                getGraph={this.props.getGraph} />
           </Drawer>
           <main className="App-graph-container" ref={this.graphContainerRef} >
             {
-              selectedGraph ||
+              displayGraph ||
               this.props.grapherMode === grapherModes.createDapp
               ? <Grapher
                   accountGraph={this.props.accountGraph}
@@ -241,12 +244,15 @@ class App extends Component {
                   graphInsertions={this.props.graphInsertions}
                   insertionGraph={insertionGraph}
                   insertionGraphId={this.props.insertionGraphId}
-                  openContractForm={this.props.openAppModal}
-                  selectedGraph={selectedGraph}
-                  selectedGraphId={this.props.selectedGraphId}
+                  openContractForm={
+                    () => this.props.openModal(modalContentTypes.contractForm)
+                  }
+                  displayGraph={displayGraph}
+                  displayGraphId={this.props.displayGraphId}
                   storeWipGraph={this.props.updateWipGraph}
                   wipGraph={this.props.wipGraph}
-                  selectContractFunction={this.props.selectContractFunction} />
+                  selectContractFunction={this.props.selectContractFunction}
+                  selectFormGraph={this.props.selectFormGraph} />
               : (
                   <Typography
                     variant="title"
@@ -262,50 +268,117 @@ class App extends Component {
                 )
             }
           </main>
-          <div className="App-modal-container" >
-            <AppModal
+          <div>
+            <Modal
               classes={{ root: classes.root, paper: classes.paper }}
-              open={this.props.appModal}
-              onClose={this.props.closeAppModal}
+              open={this.props.isModalOpen}
+              onClose={this.props.closeModal}
             >
               {
-                selectedGraph
-                ? (
-                    <ContractForm
-                      classes={{
-                         container: classes.container,
-                         textField: classes.textField,
-                         button: classes.button,
-                         nested: classes.nested,
-                      }}
-                      account={this.props.account}
-                      contractAddress={this.props.selectedContractAddress}
-                      selectedGraph={selectedGraph}
-                      deployContract={this.props.deployContract}
-                      callInstance={this.props.callInstance}
-                      closeContractForm={this.props.closeAppModal}
-                      selectContractFunction={this.props.selectContractFunction}
-                      selectedContractFunction={this.props.selectedContractFunction}
-                      heading={selectedGraph.name}
-                      wipDappDeployment={this.props.wipDappDeployment}
-                      updateWipDappDeployment={this.props.updateWipDappDeployment}
-                      dappTemplate={
-                        this.props.selectedDappTemplateId
-                        ? this.props.dapps[this.props.selectedDappTemplateId]
-                        : null
-                      }
-                      fieldValues={this.props.contractFormFieldValues}
-                      storeFieldValues={
-                        this.props.saveContractFormFieldValues
-                      } />
-                  )
-                : null
+                this.getModalContent(
+                  classes, displayGraph
+                )
               }
-            </AppModal>
+            </Modal>
+            <Snackbar
+              classes={{ close: this.props.classes.close }}
+              duration={this.props.snackbarDuration}
+              message={this.props.snackbarMessage} />
           </div>
         </div>
       </Fragment>
     )
+  }
+
+  /**
+   * Returns the correct modal content, per state.ui.modal.content.
+   * This is either a form for interacting with contracts - whether deployed
+   * instances or undeployed constructors, alone or as part of dapp templates -
+   * or dapps - when adding new templates or deploying instances of templates.
+   *
+   * @returns {jsx} the components constituting the modal's content
+   */
+  getModalContent = (classes, displayGraph) => {
+
+    const formClasses = {
+       container: classes.container,
+       textField: classes.textField,
+       button: classes.button,
+       nested: classes.nested,
+    }
+
+    const formGraph = (
+      this.props.selectedFormGraphObject
+      ? this.props.selectedFormGraphObject.toJS()
+      : displayGraph
+    )
+
+    const selectedFunctionName = (
+      formGraph && this.props.selectedContractFunction
+      ? formGraph.elements.nodes[
+          this.props.selectedContractFunction
+        ].displayName
+      : null
+    )
+
+    switch (this.props.modalContent) {
+
+      case modalContentTypes.contractForm:
+        return (
+          <ContractForm
+            classes={formClasses}
+            account={this.props.account}
+            contractAddress={this.props.selectedContractAddress}
+            graph={formGraph}
+            deployContract={this.props.deployContract}
+            callInstance={this.props.callInstance}
+            closeContractForm={this.props.closeModal}
+            selectContractFunction={this.props.selectContractFunction}
+            selectedContractFunction={this.props.selectedContractFunction}
+            heading={selectedFunctionName || formGraph.name}
+            wipDappDeployment={this.props.wipDappDeployment}
+            updateWipDappDeployment={this.props.updateWipDappDeployment}
+            dappTemplate={
+              this.props.selectedDappTemplateId
+              ? this.props.dapps[this.props.selectedDappTemplateId]
+              : null
+            }
+            fieldValues={this.props.modalFormFieldValues}
+            storeFieldValues={
+              this.props.saveModalFormFieldValues
+            }
+            addSnackbarNotification={this.props.addSnackbarNotification} />
+        )
+
+      case modalContentTypes.dappForm:
+        return (
+          <DappForm
+            classes={formClasses}
+            heading={
+              this.props.grapherMode === grapherModes.createDapp
+              ? 'Create New Template'
+              : 'Deploy Dapp'
+            }
+            deployDapp={this.props.deployDapp}
+            closeModal={this.props.closeModal}
+            fieldValues={this.props.modalFormFieldValues}
+            grapherMode={this.props.grapherMode}
+            storeFieldValues={
+              this.props.saveModalFormFieldValues
+            }
+            addDappTemplate={this.props.addDappTemplate}
+            setGrapherMode={this.props.setGrapherMode} />
+        )
+
+      case null:
+        return null
+
+      default:
+        console.warn(
+          'unhandled modal content type: ' + this.props.modalContent
+        )
+        return null
+    }
   }
 }
 
@@ -334,41 +407,41 @@ App.propTypes = {
   createGraph: PropTypes.func,
   deleteGraph: PropTypes.func,
   deleteAllGraphs: PropTypes.func,
+  formGraphId: PropTypes.string,
   grapherMode: PropTypes.string,
+  getGraph: PropTypes.func,
   graphInsertions: PropTypes.number,
   hasGraphs: PropTypes.bool,
   insertionGraphId: PropTypes.string,
   insertionGraphObject: PropTypes.object,
-  selectGraph: PropTypes.func,
-  selectedGraphId: PropTypes.string,
-  selectedGraphObject: PropTypes.object,
+  selectFormGraph: PropTypes.func,
+  selectedFormGraphObject: PropTypes.object,
+  selectedFormGraph: PropTypes.object,
+  selectDisplayGraph: PropTypes.func,
+  displayGraphId: PropTypes.string,
+  displayGraphObject: PropTypes.object,
   setGrapherMode: PropTypes.func,
-  saveWipGraph: PropTypes.func,
+  addDappTemplate: PropTypes.func,
   updateWipGraph: PropTypes.func,
   wipGraph: PropTypes.object,
   // renderErrors
   logRenderError: PropTypes.func,
   // ui
-  appModal: PropTypes.bool,
-  closeAppModal: PropTypes.func,
-  openAppModal: PropTypes.func,
+  isModalOpen: PropTypes.bool,
+  closeModal: PropTypes.func,
+  openModal: PropTypes.func,
   selectContractFunction: PropTypes.func,
   selectedContractFunction: PropTypes.string,
-  contractFormFieldValues: PropTypes.object,
-  saveContractFormFieldValues: PropTypes.func,
-  deleteContractFormFieldValues: PropTypes.func,
+  modalFormFieldValues: PropTypes.object,
+  modalContent: PropTypes.string,
+  saveModalFormFieldValues: PropTypes.func,
+  addSnackbarNotification: PropTypes.func,
+  snackbarMessage: PropTypes.string,
+  snackbarDuration: PropTypes.number,
   // web3
   account: PropTypes.string,
   networkId: PropTypes.string,
   getWeb3: PropTypes.func,
-  web3: (props, propName, componentName) => {
-    if (props[propName] !== null && typeof props[propName] !== 'object') {
-      return new Error(
-        'Invalid ' + propName +
-        ': Neither null nor an object for component ' + componentName
-      )
-    }
-  },
 }
 
 function mapStateToProps (state) {
@@ -393,25 +466,29 @@ function mapStateToProps (state) {
     insertionGraphId: state.grapher.insertionGraphId,
     insertionGraphObject: state.grapher.graphs[state.grapher.insertionGraphId],
     graphInsertions: state.grapher.insertions,
-    selectedGraphId: state.grapher.selectedGraphId,
-    selectedGraphObject: state.grapher.graphs[state.grapher.selectedGraphId],
+    selectedFormGraphObject: state.grapher.graphs[state.grapher.formGraphId],
+    displayGraphId: state.grapher.displayGraphId,
+    displayGraphObject: state.grapher.graphs[state.grapher.displayGraphId],
     hasGraphs: Object.keys(state.grapher.graphs).length >= 1,
     wipGraph: state.grapher.wipGraph,
+    formGraphId: state.grapher.formGraphId,
     // ui
-    appModal: state.ui.appModal.open,
+    isModalOpen: state.ui.modal.open,
+    modalContent: state.ui.modal.content,
     selectedContractFunction: state.ui.contractForm.selectedFunction,
-    contractFormFieldValues: state.ui.contractForm.fieldValues,
+    modalFormFieldValues: state.ui.modal.formFieldValues,
+    snackbarMessage: state.ui.snackbar.message,
+    snackbarDuration: state.ui.snackbar.duration,
     // web3
     account: state.web3.account,
     networkId: state.web3.networkId,
-    web3: state.web3.injected,
   }
 }
 
 function mapDispatchToProps (dispatch) {
   return {
-    // contracts // TODO: where add contract type?
-    addContractType: contractJSON => dispatch(addContractType(contractJSON)),
+    // contracts
+    addContractType: (contractJson) => dispatch(addContractType(contractJson)),
     deployContract: (contractName, constructorParams) =>
       dispatch(deployContract(contractName, constructorParams)),
     addInstance: (contractName, address) =>
@@ -426,25 +503,30 @@ function mapDispatchToProps (dispatch) {
       dispatch(selectDappTemplate(dappTemplateId)),
     updateWipDappDeployment: wipDeployment =>
       dispatch(updateWipDeployment(wipDeployment)),
-    selectDeployedDapp: deployedId => dispatch(selectDeployedDapp(deployedId)),
+    selectDeployedDapp: (templateId, deployedId) =>
+      dispatch(selectDeployedDapp(templateId, deployedId)),
     // grapher
     createGraph: params => dispatch(createGraph(params)),
     deleteGraph: graphId => dispatch(deleteGraph(graphId)),
     deleteAllGraphs: () => dispatch(deleteAllGraphs()),
-    selectGraph: graphId => dispatch(selectGraph(graphId)),
-    saveWipGraph: () => dispatch(saveWipGraph()),
+    getGraph: (graphId, graphType, contractName, address) =>
+      dispatch(getGraph(graphId, graphType, contractName, address)),
+    selectFormGraph: (contractName, instanceAddress) =>
+      dispatch(selectFormGraph(contractName, instanceAddress)),
+    selectDisplayGraph: graphId => dispatch(selectDisplayGraph(graphId)),
+    addDappTemplate: templateName => dispatch(addDappTemplate(templateName)),
     updateWipGraph: wipGraph => dispatch(updateWipGraph(wipGraph)),
     // renderErrors
     logRenderError: (error, errorInfo) => dispatch(logRenderError(error, errorInfo)),
     // ui
-    closeAppModal: () => dispatch(closeAppModal()),
-    openAppModal: () => dispatch(openAppModal()),
+    addSnackbarNotification: (message, duration) =>
+      dispatch(addSnackbarNotification(message, duration)),
+    closeModal: () => dispatch(closeModal()),
+    openModal: content => dispatch(openModal(content)),
     selectContractFunction: func => dispatch(selectContractFunction(func)),
     setGrapherMode: contentKey => dispatch(setGrapherMode(contentKey)),
-    saveContractFormFieldValues: fieldValues =>
-      dispatch(saveContractFormFieldValues(fieldValues)),
-    deleteContractFormFieldValues: () =>
-      dispatch(deleteContractFormFieldValues()),
+    saveModalFormFieldValues: fieldValues =>
+      dispatch(saveModalFormFieldValues(fieldValues)),
     // web3
     getWeb3: () => dispatch(getWeb3()),
   }

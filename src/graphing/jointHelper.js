@@ -1,14 +1,20 @@
 
+/**
+ * TODO
+ * NOTE: This file will change significantly with the graphlib refactor.
+ * Do not modify until that refactor is complete.
+ */
+
 import joint from 'jointjs'
 import uuid from 'uuid/v4'
 
-import { contractGraphTypes } from './graphGenerator'
-import exampleGraphs from '../temp/graphExamples.js' // TODO: temp
+import { graphTypes } from './graphGenerator'
 
 /**
  * CONFIG
  */
 
+// config of the joint paper, essentially the SVG canvas
 const paperConfig = {
   width: 1, // arbitrary positive
   height: 1, // arbitrary positive
@@ -22,7 +28,7 @@ const paperConfig = {
   defaultRouter: {
     name: 'metro',
     args: {
-      // tbd?
+      // TODO: determine whether improvements can be made
     },
   },
   defaultConnector: {
@@ -41,9 +47,10 @@ const paperConfig = {
   },
 }
 
+// config of links, i.e. edges
 const linkConfig = {
   wrapper: {
-    strokeWidth: 25,
+    strokeWidth: 25, // extends clickable part of links beyond visible body
   },
 }
 
@@ -51,49 +58,42 @@ const linkConfig = {
  * EXPORT
  */
 
-const jointHelper = {
-  config: {
-    paper: paperConfig,
-    link: linkConfig,
-  },
-  elements: {
-    connect,
-    setLayout,
-    getAttribute: getCustomAttributeFromView,
-    setAttribute: setCustomAttributeInView,
-  },
-  setDummyElements,
-  addJointElements,
-  paper: {
-    addEventHandlers: addPaperEventHandlers,
-    initialize: initializePaper,
-  },
+export {
+  setJointElements,
+  initializeJointPaper,
 }
-
-export default jointHelper
 
 /**
  * MODEL GETTERS AND SETTERS
  */
 
 /**
- * [addJointElements description]
- * @param {[type]} jointGraph [description]
- * @param {[type]} dappGraph  [description]
- * @param {[type]} meta       [description]
+ * Sets Joint elements of jointGraph per the graph type of dappGraph. For use
+ * with single-contract or account graphs only. See setDappCells for full
+ * dapp graphs.
+ *
+ * @param {object} jointGraph  the Joint graph the elements will be added to
+ * @param {object} dappGraph  the non-Joint graph representing the dapp
+ * @param {object} meta  options for e.g. setsLayout
  */
-function addJointElements (jointGraph, dappGraph, meta) {
+function setJointElements (jointGraph, dappGraph, meta) {
 
   const graphNodes = dappGraph.elements.nodes
+
+  if (Object.values(graphTypes.dapp).includes(dappGraph.type)) {
+
+    setDappCells(jointGraph, dappGraph, meta)
+    return
+  }
 
   let cells
   switch (dappGraph.type) {
 
-    case contractGraphTypes._constructor:
+    case graphTypes.contract._constructor:
       cells = generateConstructorElement(dappGraph.name, graphNodes)
       break
 
-    case contractGraphTypes.functions:
+    case graphTypes.contract.functions:
       cells = generateFunctionsElements(dappGraph)
       break
 
@@ -106,18 +106,21 @@ function addJointElements (jointGraph, dappGraph, meta) {
       )
       break
 
-    case 'dapp':
-      setDappCells(jointGraph, dappGraph, meta)
-      return
-
     default:
       throw new Error('unknown graph type')
   }
 
   jointGraph.addCells(cells)
-  if (meta.setsLayout) setLayout(jointGraph)
+  if (meta.setsLayout) setLayout(jointGraph, meta.layoutOptions)
 }
 
+/**
+ * Generates the Joint element representing the current account node
+ *
+ * @param {object} accountNode  the non-Joint graph node representing the current account
+ * @param {object} accountChildren  the children of the account node
+ * @returns {object} the Joint element representing the current account node
+ */
 function generateAccountElement (accountNode, accountChildren) {
 
   const displayName = accountNode.displayName
@@ -126,7 +129,7 @@ function generateAccountElement (accountNode, accountChildren) {
     displayName,
     {
       size: { width: 50, height: 50 },
-      _dappGrapher: {
+      dappGrapher: {
         id: accountNode.id,
         type: accountNode.type,
       },
@@ -141,26 +144,37 @@ function generateAccountElement (accountNode, accountChildren) {
 }
 
 /**
- * [generateConstructorElement description]
- * @param  {[type]} dappGraph [description]
- * @return {[type]}           [description]
+ * Generates the default Joint element corresponding to a contstructor node
+ *
+ * @param {object} graphName the name of the parent non-Joint graph
+ * @param {object} graphNodes the nodes of the parent non-Joint graph
+ * @return {object} the generated Joint element
  */
 function generateConstructorElement (graphName, graphNodes) {
 
-  const ioNodes = Object.values(graphNodes)
+  const ioNodes =
+    Object.values(graphNodes)
     .filter(node => node.type === 'parameter' || node.type === 'output')
+    .sort((a, b) => {
+
+      if (a.type === 'output') return 1
+      if (b.type === 'output') return -1
+
+      return a.paramOrder - b.paramOrder
+    })
 
   const constructorNode = Object.values(graphNodes)
-    .filter(node => node.type === contractGraphTypes._constructor)[0]
+    .filter(node => node.type === graphTypes.contract._constructor)[0]
 
   const contractElement = generateAtomic(
     graphName,
     {
       size: { width: 175, height: 100 },
-      _dappGrapher: {
+      dappGrapher: {
         contractName: constructorNode.abiName,
         id: constructorNode.id,
         type: constructorNode.type,
+        instanceAddress: constructorNode.instanceAddress,
       },
     },
     {
@@ -174,10 +188,12 @@ function generateConstructorElement (graphName, graphNodes) {
 }
 
 /**
- * [setDappCells description]
- * @param {[type]} jointGraph [description]
- * @param {[type]} dappGraph  [description]
- * @param {[type]} meta       [description]
+ * Sets elements (shapes/nodes) and links (edges) - collectively cells - of a
+ * dapp graph with account and contract nodes.
+ *
+ * @param {object} jointGraph the Joint graph that the cells will be added to
+ * @param {object} dappGraph the non-Joint graph of the dapp
+ * @param {object} meta object with options for e.g. setsLayout
  */
 function setDappCells (jointGraph, dappGraph, meta) {
 
@@ -205,7 +221,7 @@ function setDappCells (jointGraph, dappGraph, meta) {
 
   // get constructor elements
   const constructorNodeIds = Object.values(graphNodes).filter(node => {
-    return node.type === contractGraphTypes._constructor
+    return node.type === graphTypes.contract._constructor
   }).map(node => node.id)
 
   constructorNodeIds.forEach(constructorId => {
@@ -228,10 +244,10 @@ function setDappCells (jointGraph, dappGraph, meta) {
     cells.push(constructorElement)
   })
 
-  // add elements to graph
+  // add elements (nodes) to graph
   jointGraph.addCells(cells)
 
-  // get and add links to graph
+  // get and add links to Joint graph per dapp graph edges
   Object.values(graphEdges).forEach(edge => {
     connect(
       jointGraph,
@@ -246,12 +262,18 @@ function setDappCells (jointGraph, dappGraph, meta) {
 }
 
 /**
- * [generateFunctionsElements description]
- * @param  {[type]} dappGraph [description]
- * @return {[type]}           [description]
+ * Generates the Joint elements corresponding to a complete ABI graph, i.e. a
+ * Solidity contract and all its functions.
+ *
+ * TODO: This visualization is unwieldy to say the least and should either
+ *       be improved or deprecated. It is currently not used.
+ *
+ * @param {object} dappGraph the graph which will be visualized using Joint
+ * @returns {array} the elements of the generated Joint graph
  */
 function generateFunctionsElements (dappGraph) {
 
+  // the contract element is a compound node
   const contractElement = generateCoupled(
     dappGraph.name,
     { type: dappGraph.type }
@@ -260,21 +282,34 @@ function generateFunctionsElements (dappGraph) {
   const allNodes = Object.values(dappGraph.elements.nodes)
   const functionNodes = allNodes.filter(node => node.type === 'function')
 
+  // generate function elements and their ports from the function nodes and
+  // their respective input nodes
   const functionElements = functionNodes.map(node => {
 
-    const ioNodes = allNodes.filter(n => n.parent === node.id)
+    const ioNodes = allNodes.filter(n => n.parent === node.id).sort((a, b) => {
+
+      // there's only a single output so make it last
+      if (a.type === 'output') return 1
+      if (b.type === 'output') return -1
+
+      // display input ports in their ABI order
+      return a.paramOrder - b.paramOrder
+    })
 
     const funcElement = generateAtomic(
       node.displayName,
       {
-        size: { width: 75, height: 150 },
-        _dappGrapher: {
+        size: { width: 175, height: 100 },
+        dappGrapher: {
           id: node.id,
           abiName: node.abiName,
           abiType: node.abiType,
         },
       },
-      null,
+      {
+        '.label': { 'text-anchor': 'middle', 'ref-y': 40 },
+        '.body': { 'rx': 10, 'ry': 10 },
+      },
       ioNodes.length > 0 ? ioNodes : null
     )
     contractElement.embed(funcElement)
@@ -288,21 +323,39 @@ function generateFunctionsElements (dappGraph) {
  * ELEMENT FACTORIES
  */
 
+/**
+ * Generates a Coupled shape, an element which can embed Atomic shapes to
+ * create compound nodes.
+ *
+ * @param {string} displayName the visual name of the element
+ * @param {object} props properties of the element initialized through its constructor
+ * @returns {object} the generated Coupled element
+ */
 function generateCoupled (displayName, props = {}) {
 
   const coupled = new joint.shapes.devs.Coupled({
-    _dappGrapher: { ...props },
+    dappGrapher: { ...props },
   })
   coupled.attr({
     text: { text: displayName, fill: 'black'},
     '.body': {
-      'rx': 6,
-      'ry': 6,
+      'rx': 6, // rounded corners
+      'ry': 6, // rounded corners
     },
   })
   return coupled
 }
 
+/**
+ * Generates an Atomic shape, an element which can be embedded in a Coupled
+ * shape to create compound nodes.
+ *
+ * @param {string} displayName the visual name of the element
+ * @param {object} constructorProps properties of the element best initialized through its constructor
+ * @param {object} attributes properties of the elements best set after its instantiation
+ * @param {array} ioNodes an array of non-joint graph nodes representing the element's inputs and outputs
+ * @return {object} the generated Atomic element
+ */
 function generateAtomic (
   displayName,
   constructorProps = {},
@@ -319,9 +372,6 @@ function generateAtomic (
   })
 
   if (ioNodes) {
-    // atomic.attributes.ports.groups.in.position.name = 'top'
-    // atomic.attributes.ports.groups.in.label.position.name = 'top'
-    // atomic.attributes.ports.groups.in.label.position.args.y = -10
     const ports = generatePorts(ioNodes, true)
     ports.forEach(port => {
       if (port.type === 'in') atomic.addInPort(port.name, port.opts)
@@ -332,6 +382,16 @@ function generateAtomic (
   return atomic
 }
 
+/**
+ * Generates the ports for a Joint element from the dapp/contract graph nodes
+ * representing the inputs and outputs of a contract.
+ *
+ * Links attach to ports, which belong to some parent element.
+ *
+ * @param {array} ioNodes array of non-joint graph nodes
+ * @param {boolean} isInOut=false some Joint shapes have in/out ports, others just ports
+ * @returns {array} array of Joint port objects for a single Joint element
+ */
 function generatePorts (ioNodes, isInOut = false) {
 
   const ports = []
@@ -344,24 +404,22 @@ function generatePorts (ioNodes, isInOut = false) {
         throw new Error('invalid port node; neither parameter nor output')
       }
 
+      // ports are either link/edge sources ('out') or targets ('in')
       const typeProp = node.type === 'output' ? 'out' : 'in'
 
-      let props
+      // some elements/shapes have different port interfaces
+      const props = {}
       if (isInOut) {
-        props = {
-          type: typeProp,
-          name: node.displayName,
-        }
+        props.type = typeProp
+        props.name = node.displayName
       } else {
-        props = {
-          group: typeProp,
-          attrs: { text: { text: node.displayName } },
-        }
+        props.group = typeProp
+        props.attrs = { text: { text: node.displayName } }
       }
 
       ports.push({
         opts: {
-          _dappGrapher: {
+          dappGrapher: {
             id: node.id,
             abiName: node.abiName,
             abiType: node.abiType,
@@ -369,15 +427,19 @@ function generatePorts (ioNodes, isInOut = false) {
         },
         ...props,
       })
-  })
-}
+    })
+  }
 
   return ports
 }
 
+/**
+ * @returns {object} a default skeleton link to be used when new links are
+ * added.
+ */
 function getDefaultLink () {
   const link = new joint.shapes.standard.Link({
-    _dappGrapher: {},
+    dappGrapher: {},
   })
   link.attr(linkConfig)
   return link
@@ -387,15 +449,26 @@ function getDefaultLink () {
  * PAPER AND GRAPH MANIPULATORS
  */
 
-function initializePaper (jointElement, jointGraph, eventHandlers) {
+/**
+ * Initializes the Joint paper for the given Joint graph.
+ *
+ * Note: Joint consists of a Joint graph, representing the graph/data to be
+ * rendered, and a Joint paper which is essentially the SVG canvas.
+ *
+ * @param {object} jointElement the parent DOM element
+ * @param {object} jointGraph the graph of the joint paper
+ * @param {object} eventHandlers event handlers declared in the caller
+ * @returns {object} the Joint paper
+ */
+function initializeJointPaper (jointElement, jointGraph, eventHandlers) {
 
   const paper = new joint.dia.Paper({
     ...paperConfig,
     el: jointElement,
     model: jointGraph,
   })
-  paper._dappGrapher = {
-    panning: false,
+  paper.dappGrapher = {
+    panning: false, // indicates whether panning is currently enabled
   }
 
   paper.scale(0.8)
@@ -405,24 +478,36 @@ function initializePaper (jointElement, jointGraph, eventHandlers) {
   return paper
 }
 
+/**
+ * Adds necessary event handlers to the joint paper
+ *
+ * @param {object} paper the joint paper to add event handlers to
+ * @param {object} handlers handler functions that must be defined by caller
+ */
 function addPaperEventHandlers (paper, handlers) {
 
   // open contract form
   paper.on('element:pointerdblclick', (view, evt, x, y) => {
 
-    console.log(view.model)
+    // console.log(view.model) // dev/debug
 
-    const nodeType = getCustomAttributeFromView(view, 'type')
+    const node = view.model
+    const nodeType = node.attributes.dappGrapher.type
 
+    // all nodes should have a type
     if (!nodeType) {
       console.warn('joint element missing type')
       return
     }
 
-    if (Object.values(contractGraphTypes).includes(nodeType)) {
+    // contract form only opens if a contract node is clicked
+    if (Object.values(graphTypes.contract).includes(nodeType)) {
 
-      handlers.openForm(getCustomAttributeFromView(view, 'id'))
-
+      handlers.openForm(
+        node.attributes.dappGrapher.id,
+        node.attributes.dappGrapher.contractName,
+        node.attributes.dappGrapher.instanceAddress
+      )
     } else if (nodeType === 'ui') {
       // do nothing
     } else {
@@ -435,22 +520,24 @@ function addPaperEventHandlers (paper, handlers) {
 
     const link = linkView.model
 
-    // if there's an id, we don't want it
-    if (link.attributes._dappGrapher.id) return
+    // defensive programming: if there's an id, it already exists, so return
+    if (link.attributes.dappGrapher.id) return
 
+    // Joint has links
     const linkId = uuid()
 
-    link.attributes._dappGrapher.id = linkId
+    link.attributes.dappGrapher.id = linkId
 
+    // graphs have edges
     const edge = {}
 
-    edge.id = link.attributes._dappGrapher.id
+    edge.id = link.attributes.dappGrapher.id
 
     const source = link.getSourceElement()
     const target = link.getTargetElement()
 
-    edge.sourceParent = source.attributes._dappGrapher.id
-    edge.targetParent = target.attributes._dappGrapher.id
+    edge.sourceParent = source.attributes.dappGrapher.id
+    edge.targetParent = target.attributes.dappGrapher.id
 
     edge.sourceName = link.attributes.source.port
     edge.targetName = link.attributes.target.port
@@ -461,18 +548,27 @@ function addPaperEventHandlers (paper, handlers) {
   // link removal
   paper.on('link:pointerdblclick', linkView => {
 
-    handlers.removeEdge(linkView.model.attributes._dappGrapher.id)
+    handlers.removeEdge(linkView.model.attributes.dappGrapher.id)
     linkView.model.remove()
   })
 
   // toggle panning
   paper.on('blank:pointerdblclick', (view, evt) => {
 
-    paper._dappGrapher.panning = !paper._dappGrapher.panning
+    paper.dappGrapher.panning = !paper.dappGrapher.panning
   })
 }
 
-function connect (graph, source, sourcePort, target, targetPort) {
+/**
+ * Connects two ports of two elements in a joint graph
+ *
+ * @param {object} jointGraph the parent joint graph
+ * @param {object} source the source element
+ * @param {object} sourcePort the out-port of the source element
+ * @param {object} target the target element
+ * @param {object} targetPort the in-port of the target element
+ */
+function connect (jointGraph, source, sourcePort, target, targetPort) {
 
   const link = new joint.shapes.standard.Link({
       source: {
@@ -487,14 +583,21 @@ function connect (graph, source, sourcePort, target, targetPort) {
 
   link.attr(linkConfig)
 
-  link.addTo(graph).reparent()
+  link.addTo(jointGraph).reparent()
 }
 
-function setLayout (graph) {
+/**
+ * Applies a directed graph (dagre) layout to the given the joint graph per
+ * options
+ *
+ * @param {object} jointGraph the joint graph to set the layout for
+ * @param {object} options the options for the layout, if any
+ */
+function setLayout (jointGraph, options = {}) {
 
-  joint.layout.DirectedGraph.layout(graph, {
+  joint.layout.DirectedGraph.layout(jointGraph, {
     setLinkVertices: false,
-    rankDir: 'LR', // left to right
+    rankDir: options.rankDir ? options.rankDir : 'LR', // left to right
     rankSep: 100,
     edgeSep: 25,
     marginX: 300, // TODO: set dynamically
@@ -503,95 +606,3 @@ function setLayout (graph) {
   })
 }
 
-/**
- * MISC./HELPERS
- */
-
-/**
- * Gets the value of the _dappGrapher attribute of an element embedded in a
- * view, as returned from a click handler
- * @param  {cellView} view  the CellView (or child class thereof)
- * @param  {?}        key   the key of the attribute to be retrieved, or null
- * @return {?}              the value of the attribute, all dappGrapher
- *                          attributes (if key=null), or undefined
- */
-function getCustomAttributeFromView (view, key = null) {
-  return key ? view.model.attributes._dappGrapher[key]
-    : view.model.attributes._dappGrapher
-}
-
-/**
- * Sets the value of the _dappGrapher attribute of an element embedded in a
- * view, as returned from a click handler.
- *
- * @param  {cellView} view  the CellView (or child class thereof)
- * @param  {?}        key   the key of the attribute to be set
- * @param  {?}        value the value to be set
- */
-function setCustomAttributeInView (view, key = null, value = null) {
-  if (key) view.model.attributes._dappGrapher[key] = value
-}
-
-/**
- * Generates a dummy graph for testing/experimental purposes
- * @param  {object} jointGraph the target joint graph object
- */
-function setDummyElements (jointGraph) {
-
-  const rect = new joint.shapes.devs.Model({
-    position: { x: 100, y: 30 },
-    size: { width: 150, height: 75 },
-    // attrs: {},
-  })
-
-  rect.addOutPort('out')
-  const rect2 = rect.clone()
-  rect2.translate(300, 0)
-  // rect2.attr('text/text', 'World!')
-
-  rect2.addInPort('in')
-
-  const rect3 = rect2.clone()
-  rect3.translate(0, 150)
-  rect3.addOutPort('out')
-
-  const coupled1 = new joint.shapes.devs.Coupled({
-    position: { x: 700, y: 150 },
-    size: { width: 300, height: 150 },
-  })
-  coupled1.attr({
-    '.body': {
-      'rx': 6,
-      'ry': 6,
-    },
-  })
-
-  const atom1 = new joint.shapes.devs.Atomic({
-    position: { x: 700, y: 75 },
-    size: { width: 150, height: 75 },
-  })
-  const atom2 = atom1.clone()
-  atom2.translate(0, 150)
-
-  atom1.addOutPort('out')
-  atom1.addInPort('in')
-
-  atom2.addInPort('in')
-
-  const moarNodes = generateConstructorElement(exampleGraphs._constructor)
-
-  const cells = [coupled1, rect, rect2, rect3, atom1, atom2].concat(moarNodes)
-  // coupled cells must be added before embedded cells or the latter end up on the bottom
-  jointGraph.addCells(cells) // replace with generateJointJSX
-
-  coupled1.embed(atom1)
-  coupled1.embed(atom2)
-  // coupled1.fitEmbeds({padding: 50})
-
-  connect(jointGraph, rect, 'out', rect2, 'in')
-  connect(jointGraph, rect3, 'out', atom1, 'in')
-  connect(jointGraph, rect2, 'out', rect3, 'in')
-  connect(jointGraph, rect, 'out', atom2, 'in')
-
-  setLayout(jointGraph)
-}

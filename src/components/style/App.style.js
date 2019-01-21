@@ -1,5 +1,6 @@
 
 /**
+ * Courtesy:
  * https://github.com/mui-org/material-ui/tree/master/docs/src/pages/page-layout-examples/dashboard
  */
 
@@ -79,6 +80,9 @@ const appStyles = theme => ({
   },
   listItemText: {
     paddingLeft: 0,
+  },
+  undocked: {
+    width: 'auto',
   },
 })
 
