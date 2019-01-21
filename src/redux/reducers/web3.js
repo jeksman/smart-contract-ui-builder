@@ -1,8 +1,6 @@
 
 import Web3 from 'web3'
 
-import { initializeDeployer } from './contracts'
-
 const ACTIONS = {
   GET_WEB3: 'WEB3:GET_WEB3',
   GET_WEB3_SUCCESS: 'WEB3:GET_WEB3_SUCCESS',
@@ -25,6 +23,7 @@ const initialState = {
 export {
   getWeb3Thunk as getWeb3,
   getClearErrorsAction as clearweb3Errorss,
+  initialState as web3InitialState,
 }
 
 export default function reducer (state = initialState, action) {
@@ -208,6 +207,5 @@ function getWeb3AccountThunk (web3) {
 
     if (accounts.length !== 1) console.log('WARNING: More than one account found.', accounts)
     dispatch(getAccountSuccessAction(accounts[0], networkId))
-    dispatch(initializeDeployer())
   }
 }
