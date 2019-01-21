@@ -6,8 +6,8 @@ import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 
-import DropdownMenu from './DropdownMenu'
-import { contractGraphTypes } from '../graphing/parseContract'
+import DropdownMenu from './common/DropdownMenu'
+import { contractGraphTypes } from '../graphing/graphGenerator'
 
 import './style/ContractForm.css'
 
@@ -35,6 +35,23 @@ class ContractForm extends Component {
 
   state = {
     fieldValues: {},
+  }
+
+  componentDidMount () {
+
+    if (
+      this.props.selectedGraph.type === 'dapp' &&
+      Object.keys(this.props.fieldValues).length > 0
+    ) {
+      this.setState({ fieldValues: this.props.fieldValues })
+    }
+  }
+
+  componentWillUnmount () {
+
+    if (this.props.selectedGraph.type === 'dapp') {
+      this.props.storeFieldValues(this.state.fieldValues)
+    }
   }
 
   render () {
@@ -101,7 +118,7 @@ class ContractForm extends Component {
     event.preventDefault()
 
     this.props.deployContract(
-      this.props.contractName,
+      this.props.selectedGraph.name,
       metaData.paramOrder.map(id => {
         return this.state.fieldValues[id]
       })
@@ -109,18 +126,78 @@ class ContractForm extends Component {
     this.props.closeContractForm()
   }
 
+  handleDappFunctionSubmit = metaData => event => {
+
+    event.preventDefault()
+
+    const wipDeployment = {
+      ...(
+        this.props.wipDappDeployment
+        ? this.props.wipDappDeployment
+        : {}
+      ),
+    }
+
+    wipDeployment[metaData.id] = {
+      contractName: metaData.abiName,
+      deploymentOrder: this.props.dappTemplate.deployments[metaData.id].deploymentOrder,
+      params: {
+        ...metaData.params,
+      },
+      outputs: {
+        ...metaData.outputs,
+      },
+    }
+
+    Object.values(wipDeployment[metaData.id].params).forEach(param => {
+
+      if (param.source) { // this parameter is a target
+
+        if (param.sourceParent === 'account') {
+          param.value = this.props.account
+        } else console.log('ignoring param source', param.source)
+      } else {
+        param.value = this.state.fieldValues[param.id]
+      }
+    })
+
+    Object.values(wipDeployment[metaData.id].outputs).forEach(output => {
+
+      if (output.target) {
+
+        if (!wipDeployment[metaData.id].children) {
+          wipDeployment[metaData.id].children = []
+        }
+
+        wipDeployment[metaData.id].children.push({
+          type: 'address',
+          param: output.target,
+          paramParent: output.targetParent,
+          deploymentOrder: this.props.dappTemplate.deployments[output.targetParent].deploymentOrder,
+        })
+      }
+    })
+
+    this.props.updateWipDappDeployment(wipDeployment)
+    this.props.closeContractForm()
+  }
+
   getFunctionForm = () => {
 
     const { classes } = this.props
+    const nodes = this.props.selectedGraph.elements.nodes
+    const graphType = this.props.selectedGraph.type
+    const selectedNodeId = this.props.selectedContractFunction
+    const selectedNode = nodes[selectedNodeId]
 
     let formData; let submitHandler; let functionCall = false
 
-    switch (this.props.graphType) {
+    switch (graphType) {
 
       case contractGraphTypes._constructor:
 
-        submitHandler = this.handleConstructorSubmit
         formData = this.getFunctionFormFields()
+        submitHandler = this.handleConstructorSubmit
 
         break
 
@@ -128,11 +205,28 @@ class ContractForm extends Component {
 
         functionCall = true
 
+        // here, a function is only selected if selected by user from
+        // DropdownMenu component in form (see below)
         if (this.props.selectedContractFunction) {
 
           formData = this.getFunctionFormFields()
           submitHandler = this.handleFunctionSubmit
         }
+
+        break
+
+      case 'dapp':
+
+        // in the case of a dapp, a function id is selected in Grapher,
+        // by an event handler in the Joint paper and passed to
+        // this.props.selectedContractFunction
+
+        if (selectedNode.type === contractGraphTypes.functions) {
+          functionCall = true
+        }
+
+        formData = this.getFunctionFormFields()
+        submitHandler = this.handleDappFunctionSubmit
 
         break
 
@@ -146,7 +240,7 @@ class ContractForm extends Component {
           functionCall
           ? <DropdownMenu
               classes={{ root: classes.root }}
-              menuItemData={getFunctionIds(this.props.nodes)}
+              menuItemData={getFunctionAndConstructorIds(nodes)}
               menuTitle="Functions"
               selectAction={this.props.selectContractFunction} />
           : null
@@ -168,7 +262,13 @@ class ContractForm extends Component {
                     variant="contained"
                     type="submit"
                   >
-                    {functionCall ? 'Call Function' : 'Deploy'}
+                    {
+                      graphType === 'dapp'
+                      ? 'Submit'
+                      : functionCall
+                        ? 'Call Function'
+                        : 'Deploy'
+                    }
                   </Button>
                 </div>
               </form>
@@ -181,45 +281,58 @@ class ContractForm extends Component {
 
   getFunctionFormFields = () => {
 
+    const nodes = this.props.selectedGraph.elements.nodes
+    const edges = this.props.selectedGraph.elements.edges
     const functionId = this.props.selectedContractFunction
     const functionNodes = []
 
-    if (!functionId) { // all nodes belong to function
-
-      Object.values(this.props.nodes).forEach(node => {
+    Object.values(nodes).forEach(node => {
+      if (node.id === functionId || node.parent === functionId) {
         functionNodes.push(node)
-      })
-    } else { // only certain nodes belong to function
-
-      Object.values(this.props.nodes).forEach(node => {
-        if (node.id === functionId || node.parent === functionId) {
-          functionNodes.push(node)
-        }
-      })
-    }
+      }
+    })
 
     const metaData = {
       params: {},
+      outputs: {},
       paramOrder: [],
     }
     const fields = []
 
     functionNodes.forEach(node => {
 
-      if (node.type === 'contract' || node.type === 'function') {
+      if (
+        Object.values(contractGraphTypes).includes(node.type) ||
+        node.type === 'function'
+      ) {
 
         metaData.title = node.displayName
         metaData.abiName = node.abiName
+        metaData.id = node.id
 
       } else if (node.type === 'parameter') {
 
         const fieldType = parseSolidityType(node.abiType)
 
-        metaData.params[node.id] = {
+        const paramData = {
           id: node.id,
           abiName: node.abiName,
+          abiType: node.abiType,
           paramOrder: node.paramOrder,
+          parentForm: node.parent,
         }
+
+        Object.values(edges).forEach(edge => {
+
+          if (edge.target === node.id) {
+            paramData.edge = edge.id
+            paramData.source = edge.source
+            paramData.sourceParent = edge.sourceParent
+          }
+        })
+
+        metaData.params[node.id] = paramData
+
         metaData.paramOrder.push(node.id)
 
         switch (fieldType) {
@@ -232,14 +345,36 @@ class ContractForm extends Component {
                 id={node.id}
                 label={node.displayName}
                 className={this.props.classes.textField}
-                value={this.state.fieldValues[node.id] ? this.state.fieldValues[node.id] : ''}
+                value={
+                  paramData.source
+                  ? this.getSourcedFieldValue(edges[paramData.edge])
+                  : this.state.fieldValues[node.id]
+                    ? this.state.fieldValues[node.id]
+                    : ''
+                }
+                disabled={Boolean(paramData.source)}
                 onChange={this.handleInputChange(node.id)}
                 margin="normal"
               />
             )
+
+            break
         }
-      } else if (node.type === 'output') console.log('ContractForm ignoring output node') // TODO: change?
-      else console.warn('ContractForm: ignoring unknown node type: ' + node.type)
+      } else if (node.type === 'output') {
+
+        Object.values(edges).forEach(edge => {
+
+          if (edge.source === node.id) {
+            metaData.outputs[edge.id] = {
+              edge: edge.id,
+              target: edge.target,
+              targetParent: edge.targetParent,
+            }
+          }
+        })
+      } else {
+        console.warn('ContractForm: ignoring unknown node type: ' + node.type)
+      }
     })
 
     fields.sort((a, b) => {
@@ -251,34 +386,49 @@ class ContractForm extends Component {
 
     return {metaData, fields}
   }
+
+  getSourcedFieldValue = (edge) => {
+
+    // TODO: handle remaining possible value sources
+    if (edge.sourceParent === 'account') {
+      return 'Current Account Address'
+    }
+    if (edge.sourceAbiType === 'address') {
+      return 'Deployed Contract Address'
+    } else throw new Error('unknown field value')
+  }
 }
 
 export default withStyles(styles)(ContractForm)
 
 ContractForm.propTypes = {
   classes: PropTypes.object.isRequired,
+  account: PropTypes.string,
   contractAddress: PropTypes.string,
   callInstance: PropTypes.func,
-  contractName: PropTypes.string,
-  graphType: PropTypes.string,
-  nodes: PropTypes.object,
   deployContract: PropTypes.func,
   closeContractForm: PropTypes.func,
   selectContractFunction: PropTypes.func,
   selectedContractFunction: PropTypes.string,
   heading: PropTypes.string,
   subHeading: PropTypes.string,
+  selectedGraph: PropTypes.object,
+  updateWipDappDeployment: PropTypes.func,
+  dappTemplate: PropTypes.object,
+  wipDappDeployment: PropTypes.object,
+  fieldValues: PropTypes.object,
+  storeFieldValues: PropTypes.func,
 }
 
 /**
  * HELPERS
  */
 
-function getFunctionIds (nodes) {
+function getFunctionAndConstructorIds (nodes) {
 
   const functions = []
   Object.values(nodes).forEach(node => {
-    if (node.type === 'function') {
+    if (node.type === 'function' || node.type === 'constructor') {
       functions.push({
         id: node.id,
         name: node.displayName,

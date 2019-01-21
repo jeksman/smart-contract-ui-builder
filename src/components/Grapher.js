@@ -1,11 +1,13 @@
 
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import joint from 'jointjs'
 import svgPanZoom from 'svg-pan-zoom'
-import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import uuid from 'uuid/v4'
 
-// import { contractGraphTypes } from '../graphing/parseContract'
+import { contractGraphTypes } from '../graphing/graphGenerator'
 import jh from '../graphing/jointHelper'
+import { grapherModes } from '../redux/reducers/grapher'
 
 export default class Grapher extends Component {
 
@@ -15,6 +17,7 @@ export default class Grapher extends Component {
       jointGraph: new joint.dia.Graph(),
       jointPaper: null,
       svgPanZoom: null,
+      creatingDapp: false,
     }
   }
 
@@ -22,30 +25,74 @@ export default class Grapher extends Component {
    * Resizes Joint Paper to fit its container
    */
   resizeJointPaper = () => {
-    // debugger
+
     let height, width
     const container = this.props.graphContainer
+
     if (container && container.current) {
+
       height = container.current.clientHeight
       width = container.current.clientWidth
+
     } else {
       // arbitrary non-zero values
       height = 1
       width = 1
     }
     this.state.jointPaper.setDimensions(width, height)
-    // this.state.jointPaper.setDimensions(1400, 488)
   }
 
+  /**
+   * Sets joint graph state per grapherMode
+   */
   setJointGraph = () => {
 
     if (!this.state.jointGraph) return
 
-    this.state.jointGraph.clear()
+    if (this.props.grapherMode === grapherModes.main) {
 
-    if (!this.props.graph) return
+      if (this.state.creatingDapp) {
 
-    jh.setJointElements(this.state.jointGraph, this.props.graph)
+        this.setState({
+          creatingDapp: false,
+        })
+      }
+
+      this.state.jointGraph.clear()
+
+      if (this.props.selectedGraph) {
+
+        jh.addJointElements(
+          this.state.jointGraph, this.props.selectedGraph, { setsLayout: true }
+        )
+      }
+
+      if (this.state.svgPanZoom) this.state.svgPanZoom.reset()
+
+    } else if (this.props.grapherMode === grapherModes.createDapp) {
+
+      // if this condition is true,
+      if (!this.state.creatingDapp) {
+
+        const wipGraph = { ...this.props.accountGraph }
+        wipGraph.contracts = {}
+        delete wipGraph.id
+        // absence of id used to indicate that user cannot save the wipGraph
+        // see ResourceMenu prop, hasWipGraph
+
+        this.state.jointGraph.clear()
+
+        jh.addJointElements(
+          this.state.jointGraph,
+          wipGraph,
+          { setsLayout: true }
+        )
+
+        wipGraph.type = 'dapp'
+
+        this.props.storeWipGraph(wipGraph)
+      }
+    }
   }
 
   // initialize jointGraph on mount
@@ -54,7 +101,11 @@ export default class Grapher extends Component {
     const paper = jh.paper.initialize(
       this.jointElement,
       this.state.jointGraph,
-      { openContractForm: this.props.openContractForm}
+      {
+        openForm: this.openForm,
+        addEdge: this.addWipGraphEdge,
+        removeEdge: this.removeWipGraphEdge,
+      }
     )
 
     this.setState({
@@ -66,10 +117,12 @@ export default class Grapher extends Component {
     window.addEventListener('resize', this.resizeJointPaper)
   }
 
+  // handles Joint state changes after mounting
   componentDidUpdate (prevProps) {
 
     this.resizeJointPaper()
 
+    // set state after first update after mount
     if (this.state.jointPaper && !this.state.svgPanZoom) {
 
       this.setState({
@@ -88,17 +141,24 @@ export default class Grapher extends Component {
       })
     }
 
-    if (prevProps.graph !== this.props.graph) this.setJointGraph()
+    // if selected graph has changed, run set workflow
+    if (prevProps.selectedGraph !== this.props.selectedGraph) {
+      this.setJointGraph()
+    }
+
+    // if graphInsertions changed, add insertion graph elements to jointGraph
+    if (
+      this.props.grapherMode === grapherModes.createDapp &&
+      prevProps.graphInsertions !== this.props.graphInsertions
+    ) {
+      this.updateWipGraph()
+    }
   }
 
+  // removes event listener created on mount
   componentWillUnmount () {
     window.removeEventListener('resize', this.resizeJointPaper)
   }
-
-  // re-initialize graph if passed new graph
-  // componentDidUpdate (prevProps) {
-
-  // }
 
   render () {
     return (
@@ -114,10 +174,132 @@ export default class Grapher extends Component {
       </div>
     )
   }
+
+  updateWipGraph = () => {
+
+    if (!this.props.wipGraph) return
+
+    const wipGraph = { ...this.props.wipGraph }
+
+    if (!wipGraph.id) wipGraph.id = uuid()
+
+    const contractId = uuid()
+    const insertionGraph = { ...this.props.insertionGraph }
+    insertionGraph.id = contractId + ':graph'
+
+    if (!wipGraph.contracts[insertionGraph.name]) {
+      wipGraph.contracts[insertionGraph.name] = []
+    }
+
+    wipGraph.contracts[insertionGraph.name].push(contractId)
+
+    Object.values(insertionGraph.elements.nodes).forEach(node => {
+
+      if (Object.values(contractGraphTypes).includes(node.type)) {
+        node.id = contractId
+      } else if (node.abiName) {
+        node.id = contractId + ':' + node.abiName
+        node.parent = contractId
+      } else if (node.type === 'output') {
+        // constructor output nodes have no abi names
+        node.id = contractId + ':instance'
+        node.parent = contractId
+      }
+      wipGraph.elements.nodes[node.id] = node
+    })
+
+    Object.values(insertionGraph.elements.edges).forEach(edge => {
+      edge.id = contractId + ':' + edge.id
+      wipGraph.elements.edges[edge.id] = edge
+    })
+
+    jh.addJointElements(
+      this.state.jointGraph,
+      insertionGraph,
+      { setsLayout: false }
+    )
+
+    this.props.storeWipGraph(wipGraph)
+  }
+
+  /**
+   * Handlers
+   */
+
+  /**
+  * Opens form per Joint state and grapherMode.
+  * Pass to Joint paper at initialization.
+  */
+  openForm = functionId => {
+
+    if (this.props.grapherMode === grapherModes.main) {
+
+      if (functionId) this.props.selectContractFunction(functionId)
+
+      this.props.openContractForm()
+    } else if (this.props.grapherMode === grapherModes.createDapp) {
+      // do nothing for now
+    }
+  }
+
+
+  addWipGraphEdge = edge => {
+
+    const wipGraph = { ...this.props.wipGraph }
+
+    for (const node of Object.values(wipGraph.elements.nodes)) {
+
+      // TODO: does not handle duplicate display names among
+      // children of the parent node (likely edge case)
+      if (!edge.source || !edge.target) {
+
+        if (
+          node.parent === edge.sourceParent &&
+          node.displayName === edge.sourceName
+        ) {
+          edge.source = node.id
+          edge.sourceAbiType = node.abiType
+        }
+
+        if (
+          node.parent === edge.targetParent &&
+          node.displayName === edge.targetName
+        ) {
+          edge.target = node.id
+          edge.targetAbiType = node.abiType
+        }
+      } else break
+    }
+
+    delete edge.sourceName
+    delete edge.targetName
+
+    wipGraph.elements.edges[edge.id] = edge
+
+    this.props.storeWipGraph(wipGraph)
+  }
+
+  removeWipGraphEdge = edgeId => {
+
+    const wipGraph = { ...this.props.wipGraph }
+
+    delete wipGraph.elements.edges[edgeId]
+
+    this.props.storeWipGraph(wipGraph)
+  }
 }
 
 Grapher.propTypes = {
-  graph: PropTypes.object,
+  accountGraph: PropTypes.object,
+  grapherMode: PropTypes.string,
   graphContainer: PropTypes.object,
+  graphInsertions: PropTypes.number,
+  insertionGraph: PropTypes.object,
+  insertionGraphId: PropTypes.string,
   openContractForm: PropTypes.func,
+  selectContractFunction: PropTypes.func,
+  selectedGraph: PropTypes.object,
+  selectedGraphId: PropTypes.string,
+  storeWipGraph: PropTypes.func,
+  wipGraph: PropTypes.object,
 }

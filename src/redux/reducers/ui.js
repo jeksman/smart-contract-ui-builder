@@ -1,22 +1,28 @@
 
 const ACTIONS = {
-  CLOSE_CONTRACT_FORM_MODAL: 'UI:CONTRACT_FORM:CLOSE_CONTRACT_FORM_MODAL',
-  OPEN_CONTRACT_FORM_MODAL: 'UI:CONTRACT_FORM:OPEN_CONTRACT_FORM_MODAL',
+  CLOSE_APP_MODAL: 'UI:APP_MODAL:CLOSE',
+  OPEN_APP_MODAL: 'UI:APP_MODAL:OPEN',
   SELECT_CONTRACT_FUNCTION: 'UI:CONTRACT_FORM:SELECT_CONTRACT_FUNCTION',
-  TOGGLE_RESOURCE_MENU: 'UI:RESOURCE_MENU:TOGGLE',
+  SAVE_CONTRACT_FORM_FIELD_VALUES: 'UI:CONTRACT_FORM:SAVE_FIELD_VALUES',
+  DELETE_CONTRACT_FORM_FIELD_VALUES: 'UI:CONTRACT_FORM:DELETE_FIELD_VALUES',
 }
 
 const initialState = {
-  contractForm: {
+  appModal: {
     open: false,
+  },
+  contractForm: {
     selectedFunction: null,
+    fieldValues: {},
   },
 }
 
 export {
-  getCloseContractFormModalAction as closeContractForm,
-  getOpenContractFormModalAction as openContractForm,
+  getCloseAppModalAction as closeAppModal,
+  getOpenAppModalAction as openAppModal,
   getSelectContractFunctionAction as selectContractFunction,
+  getSaveContractFormFieldValuesAction as saveContractFormFieldValues,
+  getDeleteContractFormFieldValuesAction as deleteContractFormFieldValues,
   initialState as uiInitialState,
 }
 
@@ -24,21 +30,15 @@ export default function reducer (state = initialState, action) {
 
   switch (action.type) {
 
-    case ACTIONS.CLOSE_CONTRACT_FORM_MODAL:
+    case ACTIONS.CLOSE_APP_MODAL:
       return {
-        ...state,
-        contractForm: {
-          ...state.contractForm,
-          open: false,
-          selectedFunction: null,
-        },
+        ...initialState,
       }
 
-    case ACTIONS.OPEN_CONTRACT_FORM_MODAL:
+    case ACTIONS.OPEN_APP_MODAL:
       return {
         ...state,
-        contractForm: {
-          ...state.contractForm,
+        appModal: {
           open: true,
         },
       }
@@ -48,7 +48,28 @@ export default function reducer (state = initialState, action) {
         ...state,
         contractForm: {
           ...state.contractForm,
-          selectedFunction: action.func,
+          selectedFunction: action.functionId,
+        },
+      }
+
+    case ACTIONS.SAVE_CONTRACT_FORM_FIELD_VALUES:
+      return {
+        ...state,
+        contractForm: {
+          ...state.contractForm,
+          fieldValues: {
+            ...state.contractForm.fieldValues,
+            ...action.fieldValues,
+          },
+        },
+      }
+
+    case ACTIONS.DELETE_CONTRACT_FORM_FIELD_VALUES:
+      return {
+        ...state,
+        contractForm: {
+          ...state.contractForm,
+          fieldValues: {},
         },
       }
 
@@ -57,25 +78,38 @@ export default function reducer (state = initialState, action) {
   }
 }
 
-/* Synchronous action creators */
+/**
+ * SYNCHRONOUS ACTION CREATORS
+ */
 
-function getCloseContractFormModalAction () {
+function getCloseAppModalAction () {
   return {
-    type: ACTIONS.CLOSE_CONTRACT_FORM_MODAL,
+    type: ACTIONS.CLOSE_APP_MODAL,
   }
 }
 
-function getOpenContractFormModalAction () {
+function getOpenAppModalAction () {
   return {
-    type: ACTIONS.OPEN_CONTRACT_FORM_MODAL,
+    type: ACTIONS.OPEN_APP_MODAL,
   }
 }
 
-function getSelectContractFunctionAction (func) {
+function getSelectContractFunctionAction (functionId) {
   return {
     type: ACTIONS.SELECT_CONTRACT_FUNCTION,
-    func: func,
+    functionId: functionId,
   }
 }
 
-/* Asynchronous action creators */
+function getSaveContractFormFieldValuesAction (fieldValues) {
+  return {
+    type: ACTIONS.SAVE_CONTRACT_FORM_FIELD_VALUES,
+    fieldValues: fieldValues,
+  }
+}
+
+function getDeleteContractFormFieldValuesAction () {
+  return {
+    type: ACTIONS.DELETE_CONTRACT_FORM_FIELD_VALUES,
+  }
+}

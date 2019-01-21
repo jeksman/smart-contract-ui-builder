@@ -1,27 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="5a771b51-a307-461e-a119-49a96d08f91e" name="Default" comment="">
+    <list default="true" id="5a771b51-a307-461e-a119-49a96d08f91e" name="Default" comment="basic dapp deployment complete">
+      <change beforePath="" afterPath="$PROJECT_DIR$/src/components/common/AppModal.js" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/src/components/common/DropdownMenu.js" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/src/components/common/ListButton.js" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/src/components/common/NestedList.js" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/src/graphing/graphGenerator.js" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/src/utils.js" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" afterPath="$PROJECT_DIR$/package-lock.json" />
       <change beforePath="$PROJECT_DIR$/src/components/App.js" afterPath="$PROJECT_DIR$/src/components/App.js" />
-      <change beforePath="$PROJECT_DIR$/src/components/AppModal.js" afterPath="" />
       <change beforePath="$PROJECT_DIR$/src/components/ContractForm.js" afterPath="$PROJECT_DIR$/src/components/ContractForm.js" />
-      <change beforePath="$PROJECT_DIR$/src/components/ContractInstancesList.js" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/components/DropdownMenu.js" afterPath="$PROJECT_DIR$/src/components/DropdownMenu.js" />
+      <change beforePath="$PROJECT_DIR$/src/components/ContractResourceList.js" afterPath="$PROJECT_DIR$/src/components/ContractResourceList.js" />
+      <change beforePath="$PROJECT_DIR$/src/components/DappResourceList.js" afterPath="$PROJECT_DIR$/src/components/DappResourceList.js" />
+      <change beforePath="$PROJECT_DIR$/src/components/DropdownMenu.js" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/components/Grapher.js" afterPath="$PROJECT_DIR$/src/components/Grapher.js" />
       <change beforePath="$PROJECT_DIR$/src/components/Header.js" afterPath="$PROJECT_DIR$/src/components/Header.js" />
       <change beforePath="$PROJECT_DIR$/src/components/ResourceMenu.js" afterPath="$PROJECT_DIR$/src/components/ResourceMenu.js" />
-      <change beforePath="$PROJECT_DIR$/src/components/style/App.css" afterPath="$PROJECT_DIR$/src/components/style/App.css" />
-      <change beforePath="$PROJECT_DIR$/src/components/style/App.style.js" afterPath="$PROJECT_DIR$/src/components/style/App.style.js" />
-      <change beforePath="$PROJECT_DIR$/src/components/style/ContractForm.css" afterPath="$PROJECT_DIR$/src/components/style/ContractForm.css" />
-      <change beforePath="$PROJECT_DIR$/src/components/style/Header.css" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/components/style/ResourceMenu.css" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/graphing/parseContract.js" afterPath="$PROJECT_DIR$/src/graphing/parseContract.js" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/AppModal.js" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/ListButton.js" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/NestedList.js" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/graphing/jointHelper.js" afterPath="$PROJECT_DIR$/src/graphing/jointHelper.js" />
+      <change beforePath="$PROJECT_DIR$/src/graphing/parseContract.js" afterPath="" />
       <change beforePath="$PROJECT_DIR$/src/redux/configureStore.js" afterPath="$PROJECT_DIR$/src/redux/configureStore.js" />
       <change beforePath="$PROJECT_DIR$/src/redux/reducers/contracts.js" afterPath="$PROJECT_DIR$/src/redux/reducers/contracts.js" />
+      <change beforePath="$PROJECT_DIR$/src/redux/reducers/dapps.js" afterPath="$PROJECT_DIR$/src/redux/reducers/dapps.js" />
       <change beforePath="$PROJECT_DIR$/src/redux/reducers/grapher.js" afterPath="$PROJECT_DIR$/src/redux/reducers/grapher.js" />
-      <change beforePath="$PROJECT_DIR$/src/redux/reducers/root.js" afterPath="$PROJECT_DIR$/src/redux/reducers/root.js" />
       <change beforePath="$PROJECT_DIR$/src/redux/reducers/ui.js" afterPath="$PROJECT_DIR$/src/redux/reducers/ui.js" />
-      <change beforePath="$PROJECT_DIR$/src/withRoot.js" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/redux/reducers/web3.js" afterPath="$PROJECT_DIR$/src/redux/reducers/web3.js" />
+      <change beforePath="$PROJECT_DIR$/src/tests/grapher.spec.js" afterPath="$PROJECT_DIR$/src/tests/grapher.spec.js" />
+      <change beforePath="$PROJECT_DIR$/src/tests/parseContract.spec.js" afterPath="$PROJECT_DIR$/src/tests/parseContract.spec.js" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -36,8 +45,21 @@
         <entry file="file://$PROJECT_DIR$/package.json">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="403">
-              <caret line="33" column="0" lean-forward="true" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
+              <caret line="33" column="0" lean-forward="false" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="jointHelper.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/graphing/jointHelper.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="74">
+              <caret line="5" column="44" lean-forward="false" selection-start-line="5" selection-start-column="44" selection-end-line="5" selection-end-column="44" />
+              <folding>
+                <element signature="e#1#28#0" expanded="true" />
+                <marker date="1548063686461" expanded="true" signature="13774:13775" ph="//..." />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -46,7 +68,7 @@
         <entry file="file://$PROJECT_DIR$/src/redux/reducers/contracts.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="403">
-              <caret line="817" column="0" lean-forward="false" selection-start-line="817" selection-start-column="0" selection-end-line="817" selection-end-column="0" />
+              <caret line="854" column="0" lean-forward="false" selection-start-line="854" selection-start-column="0" selection-end-line="854" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -141,7 +163,7 @@
     <handled-path value="$PROJECT_DIR$/node_modules" />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="653" />
+    <option name="x" value="61" />
     <option name="y" value="23" />
     <option name="width" value="1440" />
     <option name="height" value="810" />
@@ -179,35 +201,7 @@
               <item name="smart-contract-ui-builder" type="b2602c69:ProjectViewProjectNode" />
               <item name="smart-contract-ui-builder" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="components" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="smart-contract-ui-builder" type="b2602c69:ProjectViewProjectNode" />
-              <item name="smart-contract-ui-builder" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="redux" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="smart-contract-ui-builder" type="b2602c69:ProjectViewProjectNode" />
-              <item name="smart-contract-ui-builder" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="redux" type="462c0819:PsiDirectoryNode" />
-              <item name="enhancers" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="smart-contract-ui-builder" type="b2602c69:ProjectViewProjectNode" />
-              <item name="smart-contract-ui-builder" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="redux" type="462c0819:PsiDirectoryNode" />
-              <item name="enhancers" type="462c0819:PsiDirectoryNode" />
-              <item name="localstorage" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="smart-contract-ui-builder" type="b2602c69:ProjectViewProjectNode" />
-              <item name="smart-contract-ui-builder" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="redux" type="462c0819:PsiDirectoryNode" />
-              <item name="reducers" type="462c0819:PsiDirectoryNode" />
+              <item name="graphing" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="smart-contract-ui-builder" type="b2602c69:ProjectViewProjectNode" />
@@ -349,7 +343,7 @@
       <option name="presentableId" value="Default" />
       <updated>1547632775780</updated>
       <workItem from="1547632777524" duration="802000" />
-      <workItem from="1547633844931" duration="12023000" />
+      <workItem from="1547633844931" duration="12407000" />
     </task>
     <task id="LOCAL-00001" summary="add react-router-dom, add basic dynamic form generations. minor refactoring">
       <created>1547717914471</created>
@@ -463,11 +457,18 @@
       <option name="project" value="LOCAL" />
       <updated>1548063286680</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="material-ui styling port, res menu reorganization, menu bug fixes, &#10;add dapps reducers and queued contract deployments, create dapp template generation">
+      <created>1548063437701</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1548063437701</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="12825000" />
+    <option name="totallyTimeSpent" value="13209000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -479,7 +480,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="653" y="23" width="1440" height="810" extended-state="0" />
+    <frame x="61" y="23" width="1440" height="810" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -487,11 +488,11 @@
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32867134" sideWeight="0.5286123" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32867134" sideWeight="0.5457797" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32867134" sideWeight="0.47997138" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32867134" sideWeight="0.47138768" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32867134" sideWeight="0.47138768" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32867134" sideWeight="0.45422032" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2532189" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -560,7 +561,9 @@
     <MESSAGE value="add jointjs support, constructor graph generation" />
     <MESSAGE value="complete port to jointjs, resolved cosmetic issues" />
     <MESSAGE value="update chain-end, complete material-ui migration, wip styling" />
-    <option name="LAST_COMMIT_MESSAGE" value="update chain-end, complete material-ui migration, wip styling" />
+    <MESSAGE value="material-ui styling port, res menu reorganization, menu bug fixes, &#10;add dapps reducers and queued contract deployments, create dapp template generation" />
+    <MESSAGE value="basic dapp deployment complete" />
+    <option name="LAST_COMMIT_MESSAGE" value="basic dapp deployment complete" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -667,7 +670,7 @@
         <state relative-caret-position="-92">
           <caret line="36" column="15" lean-forward="false" selection-start-line="36" selection-start-column="15" selection-end-line="36" selection-end-column="15" />
           <folding>
-            <marker date="1548063335265" expanded="true" signature="11024:11025" ph="//..." />
+            <marker date="1548063686458" expanded="true" signature="15796:15797" ph="//..." />
           </folding>
         </state>
       </provider>
@@ -787,7 +790,7 @@
         <state relative-caret-position="-1258">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1548063335265" expanded="true" signature="6016:6040" ph="..." />
+            <marker date="1548063686458" expanded="true" signature="6016:6040" ph="..." />
           </folding>
         </state>
       </provider>
@@ -867,15 +870,26 @@
     <entry file="file://$PROJECT_DIR$/src/redux/reducers/contracts.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="403">
-          <caret line="817" column="0" lean-forward="false" selection-start-line="817" selection-start-column="0" selection-end-line="817" selection-end-column="0" />
+          <caret line="854" column="0" lean-forward="false" selection-start-line="854" selection-start-column="0" selection-end-line="854" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/graphing/jointHelper.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="74">
+          <caret line="5" column="44" lean-forward="false" selection-start-line="5" selection-start-column="44" selection-end-line="5" selection-end-column="44" />
+          <folding>
+            <element signature="e#1#28#0" expanded="true" />
+            <marker date="1548063686461" expanded="true" signature="13774:13775" ph="//..." />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="403">
-          <caret line="33" column="0" lean-forward="true" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
+          <caret line="33" column="0" lean-forward="false" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
           <folding />
         </state>
       </provider>

@@ -1,7 +1,8 @@
 
 import joint from 'jointjs'
+import uuid from 'uuid/v4'
 
-import { contractGraphTypes } from './parseContract'
+import { contractGraphTypes } from './graphGenerator'
 import exampleGraphs from '../temp/graphExamples.js' // TODO: temp
 
 /**
@@ -35,6 +36,7 @@ const paperConfig = {
     return parentView.model instanceof joint.shapes.devs.Coupled
   },
   validateConnection: function (sourceView, sourceMagnet, targetView, targetMagnet) {
+    // TODO: make robust
     return sourceMagnet !== targetMagnet
   },
 }
@@ -61,7 +63,7 @@ const jointHelper = {
     setAttribute: setCustomAttributeInView,
   },
   setDummyElements,
-  setJointElements,
+  addJointElements,
   paper: {
     addEventHandlers: addPaperEventHandlers,
     initialize: initializePaper,
@@ -71,47 +73,183 @@ const jointHelper = {
 export default jointHelper
 
 /**
- * GRAPH GETTERS
+ * MODEL GETTERS AND SETTERS
  */
 
-function setJointElements (jointGraph, dappGraph) {
+/**
+ * [addJointElements description]
+ * @param {[type]} jointGraph [description]
+ * @param {[type]} dappGraph  [description]
+ * @param {[type]} meta       [description]
+ */
+function addJointElements (jointGraph, dappGraph, meta) {
+
+  const graphNodes = dappGraph.elements.nodes
 
   let cells
   switch (dappGraph.type) {
 
     case contractGraphTypes._constructor:
-      cells = generateConstructorElements(dappGraph)
+      cells = generateConstructorElement(dappGraph.name, graphNodes)
       break
 
     case contractGraphTypes.functions:
       cells = generateFunctionsElements(dappGraph)
       break
 
+    case 'account':
+      cells = generateAccountElement(
+        graphNodes.account,
+        Object.values(graphNodes).filter(node => {
+          return node.parent === 'account'
+        })
+      )
+      break
+
+    case 'dapp':
+      setDappCells(jointGraph, dappGraph, meta)
+      return
+
     default:
       throw new Error('unknown graph type')
   }
+
   jointGraph.addCells(cells)
-  setLayout(jointGraph)
+  if (meta.setsLayout) setLayout(jointGraph)
 }
 
-function generateConstructorElements (dappGraph) {
+function generateAccountElement (accountNode, accountChildren) {
 
-  const ioNodes = Object.keys(dappGraph.elements.nodes).map(key => {
-    return dappGraph.elements.nodes[key]
-  }).filter(obj => obj.type === 'parameter' || obj.type === 'output')
+  const displayName = accountNode.displayName
 
-  const contractElement = generateCoupled(
-    dappGraph.name,
-    { type: dappGraph.type }
+  const accountElement = generateAtomic(
+    displayName,
+    {
+      size: { width: 50, height: 50 },
+      _dappGrapher: {
+        id: accountNode.id,
+        type: accountNode.type,
+      },
+    },
+    {
+      '.body': { 'rx': 90, 'ry': 90},
+      '.label': { 'text-anchor': 'middle', 'ref-x': 22.5, 'ref-y': -20 },
+    },
+    accountChildren
+  )
+  return accountElement
+}
+
+/**
+ * [generateConstructorElement description]
+ * @param  {[type]} dappGraph [description]
+ * @return {[type]}           [description]
+ */
+function generateConstructorElement (graphName, graphNodes) {
+
+  const ioNodes = Object.values(graphNodes)
+    .filter(node => node.type === 'parameter' || node.type === 'output')
+
+  const constructorNode = Object.values(graphNodes)
+    .filter(node => node.type === contractGraphTypes._constructor)[0]
+
+  const contractElement = generateAtomic(
+    graphName,
+    {
+      size: { width: 175, height: 100 },
+      _dappGrapher: {
+        contractName: constructorNode.abiName,
+        id: constructorNode.id,
+        type: constructorNode.type,
+      },
+    },
+    {
+      '.label': { 'text-anchor': 'middle', 'ref-y': 40 },
+      '.body': { 'rx': 10, 'ry': 10 },
+    },
+    ioNodes
   )
 
-  const ioCircles = generateIOCircles(ioNodes)
-
-  ioCircles.forEach(circle => contractElement.embed(circle))
-
-  return [contractElement].concat(ioCircles)
+  return contractElement
 }
 
+/**
+ * [setDappCells description]
+ * @param {[type]} jointGraph [description]
+ * @param {[type]} dappGraph  [description]
+ * @param {[type]} meta       [description]
+ */
+function setDappCells (jointGraph, dappGraph, meta) {
+
+  const cells = []
+
+  const graphNodes = dappGraph.elements.nodes
+  const graphEdges = dappGraph.elements.edges
+
+  const idMapping = {}
+
+  // get account element
+  const accountNode = Object.values(graphNodes).filter(node => {
+    return node.id === 'account'
+  })[0]
+
+  const accountChildren = Object.values(graphNodes).filter(node => {
+    return node.parent === 'account'
+  })
+
+  const accountElement = generateAccountElement(accountNode, accountChildren)
+
+  idMapping[accountNode.id] = accountElement.id
+
+  cells.push(accountElement)
+
+  // get constructor elements
+  const constructorNodeIds = Object.values(graphNodes).filter(node => {
+    return node.type === contractGraphTypes._constructor
+  }).map(node => node.id)
+
+  constructorNodeIds.forEach(constructorId => {
+
+    const contractElements = {}
+
+    Object.values(graphNodes).forEach(node => {
+      if (node.id === constructorId || node.parent === constructorId) {
+        contractElements[node.id] = { ...node }
+      }
+    })
+
+    const constructorElement = generateConstructorElement(
+      graphNodes[constructorId].displayName,
+      contractElements
+    )
+
+    idMapping[constructorId] = constructorElement.id
+
+    cells.push(constructorElement)
+  })
+
+  // add elements to graph
+  jointGraph.addCells(cells)
+
+  // get and add links to graph
+  Object.values(graphEdges).forEach(edge => {
+    connect(
+      jointGraph,
+      jointGraph.getCell(idMapping[edge.sourceParent]),
+      graphNodes[edge.source].displayName,
+      jointGraph.getCell(idMapping[edge.targetParent]),
+      graphNodes[edge.target].displayName,
+    )
+  })
+
+  if (meta.setsLayout) setLayout(jointGraph)
+}
+
+/**
+ * [generateFunctionsElements description]
+ * @param  {[type]} dappGraph [description]
+ * @return {[type]}           [description]
+ */
 function generateFunctionsElements (dappGraph) {
 
   const contractElement = generateCoupled(
@@ -129,10 +267,14 @@ function generateFunctionsElements (dappGraph) {
     const funcElement = generateAtomic(
       node.displayName,
       {
-        id: node.id,
-        abiName: node.abiName,
-        abiType: node.abiType,
+        size: { width: 75, height: 150 },
+        _dappGrapher: {
+          id: node.id,
+          abiName: node.abiName,
+          abiType: node.abiType,
+        },
       },
+      null,
       ioNodes.length > 0 ? ioNodes : null
     )
     contractElement.embed(funcElement)
@@ -143,13 +285,13 @@ function generateFunctionsElements (dappGraph) {
 }
 
 /**
- * ELEMENT GENERATORS
+ * ELEMENT FACTORIES
  */
 
-function generateCoupled (displayName, props = null) {
+function generateCoupled (displayName, props = {}) {
 
   const coupled = new joint.shapes.devs.Coupled({
-    _dappGrapher: props ? { ...props } : {},
+    _dappGrapher: { ...props },
   })
   coupled.attr({
     text: { text: displayName, fill: 'black'},
@@ -161,68 +303,26 @@ function generateCoupled (displayName, props = null) {
   return coupled
 }
 
-function generateIOCircles (ioNodes) {
-
-  const circles = []
-
-  if (ioNodes) {
-
-    ioNodes.forEach(node => {
-
-      if (node.type !== 'parameter' && node.type !== 'output') { throw new Error('invalid port node; neither parameter nor output') }
-
-      const circle = new joint.shapes.standard.Circle({
-        _dappGrapher: {
-          id: node.id,
-          abiName: node.abiName,
-          abiType: node.abiType,
-        },
-      })
-      circle.resize(25, 25)
-      circle.attr({
-        label: {
-          text: node.displayName,
-          fill: 'black',
-          textAnchor: 'left',
-          refX: '125%',
-          refY: '55%',
-        },
-        // TODO: wrap label for layout purposes
-        // the below doesn't work
-        // outline: {
-        //   ref: 'label',
-        //   refX: 0,
-        //   refY: 0,
-        //   refWidth: '100%',
-        //   refHeight: '100%',
-        //   strokeWidth: 1,
-        //   stroke: '#000000',
-        //   fill: 'none',
-        // },
-      })
-
-      circles.push(circle)
-  })
-}
-
-  return circles
-}
-
-function generateAtomic (displayName, nodeProps = null, ioNodes = null) {
+function generateAtomic (
+  displayName,
+  constructorProps = {},
+  attributes = {},
+  ioNodes = null
+) {
 
   const atomic = new joint.shapes.devs.Atomic({
-    size: { width: 75, height: 150 },
-    _dappGrapher: nodeProps ? { ...nodeProps } : {},
+    ...constructorProps,
   })
   atomic.attr({
     text: { text: displayName, fill: 'black'},
+    ...attributes,
   })
 
   if (ioNodes) {
     // atomic.attributes.ports.groups.in.position.name = 'top'
     // atomic.attributes.ports.groups.in.label.position.name = 'top'
     // atomic.attributes.ports.groups.in.label.position.args.y = -10
-    const ports = generatePorts(ioNodes)
+    const ports = generatePorts(ioNodes, true)
     ports.forEach(port => {
       if (port.type === 'in') atomic.addInPort(port.name, port.opts)
       else atomic.addOutPort(port.name, port.opts)
@@ -232,7 +332,7 @@ function generateAtomic (displayName, nodeProps = null, ioNodes = null) {
   return atomic
 }
 
-function generatePorts (ioNodes) {
+function generatePorts (ioNodes, isInOut = false) {
 
   const ports = []
 
@@ -244,8 +344,22 @@ function generatePorts (ioNodes) {
         throw new Error('invalid port node; neither parameter nor output')
       }
 
+      const typeProp = node.type === 'output' ? 'out' : 'in'
+
+      let props
+      if (isInOut) {
+        props = {
+          type: typeProp,
+          name: node.displayName,
+        }
+      } else {
+        props = {
+          group: typeProp,
+          attrs: { text: { text: node.displayName } },
+        }
+      }
+
       ports.push({
-        name: node.displayName,
         opts: {
           _dappGrapher: {
             id: node.id,
@@ -253,7 +367,7 @@ function generatePorts (ioNodes) {
             abiType: node.abiType,
           },
         },
-        type: node.type === 'output' ? 'out' : 'in',
+        ...props,
       })
   })
 }
@@ -273,12 +387,12 @@ function getDefaultLink () {
  * PAPER AND GRAPH MANIPULATORS
  */
 
-function initializePaper (jointElement, graph, eventHandlers) {
+function initializePaper (jointElement, jointGraph, eventHandlers) {
 
   const paper = new joint.dia.Paper({
     ...paperConfig,
     el: jointElement,
-    model: graph,
+    model: jointGraph,
   })
   paper._dappGrapher = {
     panning: false,
@@ -296,7 +410,7 @@ function addPaperEventHandlers (paper, handlers) {
   // open contract form
   paper.on('element:pointerdblclick', (view, evt, x, y) => {
 
-    console.log(view, evt) // dev temp
+    console.log(view.model)
 
     const nodeType = getCustomAttributeFromView(view, 'type')
 
@@ -306,19 +420,54 @@ function addPaperEventHandlers (paper, handlers) {
     }
 
     if (Object.values(contractGraphTypes).includes(nodeType)) {
-      handlers.openContractForm()
+
+      handlers.openForm(getCustomAttributeFromView(view, 'id'))
+
+    } else if (nodeType === 'ui') {
+      // do nothing
     } else {
-      console.warn('unhandled node type')
+      console.warn('unhandled node type: ' + nodeType)
     }
   })
 
+  // when a link is added
+  paper.on('link:connect', linkView => {
+
+    const link = linkView.model
+
+    // if there's an id, we don't want it
+    if (link.attributes._dappGrapher.id) return
+
+    const linkId = uuid()
+
+    link.attributes._dappGrapher.id = linkId
+
+    const edge = {}
+
+    edge.id = link.attributes._dappGrapher.id
+
+    const source = link.getSourceElement()
+    const target = link.getTargetElement()
+
+    edge.sourceParent = source.attributes._dappGrapher.id
+    edge.targetParent = target.attributes._dappGrapher.id
+
+    edge.sourceName = link.attributes.source.port
+    edge.targetName = link.attributes.target.port
+
+    handlers.addEdge(edge)
+  })
+
   // link removal
-  paper.on('link:pointerdblclick', (view) => {
-      view.model.remove()
+  paper.on('link:pointerdblclick', linkView => {
+
+    handlers.removeEdge(linkView.model.attributes._dappGrapher.id)
+    linkView.model.remove()
   })
 
   // toggle panning
-  paper.on('blank:pointerdblclick', () => {
+  paper.on('blank:pointerdblclick', (view, evt) => {
+
     paper._dappGrapher.panning = !paper._dappGrapher.panning
   })
 }
@@ -345,11 +494,11 @@ function setLayout (graph) {
 
   joint.layout.DirectedGraph.layout(graph, {
     setLinkVertices: false,
-    rankDir: 'TB', // left-right
+    rankDir: 'LR', // left to right
     rankSep: 100,
     edgeSep: 25,
-    marginX: 100,
-    marginY: 100,
+    marginX: 300, // TODO: set dynamically
+    marginY: 300,
     clusterPadding: { top: 30, left: 30, right: 30, bottom: 30 },
   })
 }
@@ -429,7 +578,7 @@ function setDummyElements (jointGraph) {
 
   atom2.addInPort('in')
 
-  const moarNodes = generateConstructorElements(exampleGraphs._constructor)
+  const moarNodes = generateConstructorElement(exampleGraphs._constructor)
 
   const cells = [coupled1, rect, rect2, rect3, atom1, atom2].concat(moarNodes)
   // coupled cells must be added before embedded cells or the latter end up on the bottom
@@ -445,29 +594,4 @@ function setDummyElements (jointGraph) {
   connect(jointGraph, rect, 'out', atom2, 'in')
 
   setLayout(jointGraph)
-
-  // TODO: non-functional attempt at resetting position of child is moved out of parent
-  //       based on old API,=
-  // atom1.on('change:position', function(cell, position) {
-
-  //   var parentId = cell.get('parent')
-  //   if (!parentId) return
-
-  //   var parent = jointGraph.getCell(parentId)
-  //   var parentBbox = parent.getBBox()
-  //   var cellBbox = cell.getBBox()
-
-  //   if (parentBbox.containsPoint(cellBbox.origin()) &&
-  //     parentBbox.containsPoint(cellBbox.topRight()) &&
-  //     parentBbox.containsPoint(cellBbox.corner()) &&
-  //     parentBbox.containsPoint(cellBbox.bottomLeft())) {
-
-  //     // All the four corners of the child are inside
-  //     // the parent area.
-  //     return
-  //   }
-  //   debugger
-  //   // Revert the child position.
-  //   cell.set('position', cell.previous('position'))
-  // })
 }

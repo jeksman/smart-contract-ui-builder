@@ -7,13 +7,14 @@ import ListItemText from '@material-ui/core/ListItemText'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline'
-// import CloudQueueIcon from '@material-ui/icons/CloudQueue'
-// import SubjectIcon from '@material-ui/icons/Subject'
+import ExtensionIcon from '@material-ui/icons/Extension'
+import CloudQueueIcon from '@material-ui/icons/CloudQueue'
 
-// import NestedList from './ui/NestedList'
-// import ListButton from './ui/ListButton'
+import NestedList from './common/NestedList'
+import ListButton from './common/ListButton'
 
-// import { contractGraphTypes } from '../graphing/parseContract'
+// import { contractGraphTypes } from '../graphing/graphGenerator'
+import { grapherModes } from '../redux/reducers/grapher'
 import { spacingUnit } from '../withMuiRoot'
 
 const styles = theme => ({
@@ -37,7 +38,7 @@ class DappResourceList extends Component {
     return (
       <Fragment>
         <ListItem button
-          onClick={e => { console.log('clicky clik') }}
+          onClick={ () => this.props.setGrapherMode(grapherModes.createDapp) }
           style={{ paddingLeft: spacingUnit * 4 }}
         >
           <ListItemIcon>
@@ -50,29 +51,88 @@ class DappResourceList extends Component {
     )
   }
 
-  getTemplateListItems = (dapps) => {
+  handleDeployNewClick = (templateId, graphId) => {
+    this.props.selectTemplate(templateId)
+    this.props.selectGraph(graphId)
+  }
+
+  handleDeployedClick = (templateId, deployedId) => {
+
+    if (this.props.selectedTemplateId !== templateId) {
+      this.props.selectTemplate(templateId)
+    }
+    this.props.selectDeployed(deployedId)
+  }
+
+  getTemplateListItems = dapps => {
 
     const dappIds = Object.keys(dapps)
 
     if (dappIds.length < 1) return null
 
-    // return dappIds.map( id => {
+    return dappIds.map(id => {
 
-    //   return (
-    //     <NestedList
-    //       key={id}
-    //     >
-    //       <TemplateListButton />
-    //     </NestedList>
-    //   )
-    // })
-    return ''
+      const hasDeployed = Object.keys(dapps[id].deployed).length > 0
+
+      return (
+        <NestedList
+          key={id}
+          icon={(<ExtensionIcon />)}
+          displayText={dapps[id].name}
+          buttonPadding={spacingUnit * 4}
+        >
+          <ListButton
+            disabled={false}
+            displayText={'Deploy New'}
+            icon={(<AddCircleOutlineIcon />)}
+            onClick={ () => this.handleDeployNewClick(id, dapps[id].dappGraphId)}
+            style={{ paddingLeft: spacingUnit * 6 }} />
+          <NestedList
+            icon={(<CloudQueueIcon />)}
+            displayText="Deployed"
+            disabled={!hasDeployed}
+            buttonPadding={spacingUnit * 6}
+          >
+            {
+              hasDeployed
+              ? this.getDeployedListItems(id, dapps[id].deployed)
+              : null
+            }
+          </NestedList>
+        </NestedList>
+      )
+    })
+  }
+
+  getDeployedListItems = (templateId, deployed) => {
+
+    if (!deployed) return null
+
+    // TODO: sort?
+    return Object.values(deployed).map(item => {
+
+      return (
+        <ListButton
+          key={item.id}
+          disabled={item.id === this.props.selectedTemplateId}
+          displayText={item.displayName}
+          inset={true}
+          primaryTypographyProps={{ noWrap: true }}
+          onClick={() => this.handleDeployedClick(templateId, item.id)} />
+      )
+    })
   }
 }
 
 DappResourceList.propTypes = {
   // classes: PropTypes.object.isRequired,
   dapps: PropTypes.object.isRequired,
+  setGrapherMode: PropTypes.func,
+  selectGraph: PropTypes.func,
+  selectTemplate: PropTypes.func,
+  selectDeployed: PropTypes.func,
+  selectedDeployedId: PropTypes.string,
+  selectedTemplateId: PropTypes.string,
 }
 
 export default withStyles(styles)(DappResourceList)

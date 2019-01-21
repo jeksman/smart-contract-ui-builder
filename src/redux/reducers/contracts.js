@@ -6,12 +6,10 @@ import {
   callInstance,
 } from 'chain-end'
 
-import { contractGraphTypes as graphTypes } from '../../graphing/parseContract'
+import { contractGraphTypes as graphTypes } from '../../graphing/graphGenerator'
 
 import {
-  dappDeploymentSuccess,
-  dappDeploymentFailure,
-  dappDeploymentEnd,
+  dappDeploymentResult,
 } from './dapps'
 
 import { deleteGraph } from './grapher'
@@ -53,7 +51,7 @@ Object.entries(defaultContracts).forEach(([key, value]) => {
 
 const initialState = {
   instances: {},
-  deploymentQueue: [],
+  deploymentQueue: null,
   types: contracts, // TODO: store these by a unique id, not name?
   errors: null,
   callHistory: null,
@@ -145,13 +143,13 @@ export default function reducer (state = initialState, action) {
     case ACTIONS.ENQUEUE_DEPLOYMENTS:
       return {
         ...state,
-        deploymentQueue: state.deploymentQueue.concat(action.deployments),
+        deploymentQueue: action.deployments,
       }
 
     case ACTIONS.RESET_DEPLOYMENT_QUEUE:
       return {
         ...state,
-        deploymentQueue: [],
+        deploymentQueue: null,
       }
 
     case ACTIONS.BEGIN_DEPLOYMENT:
@@ -544,7 +542,11 @@ function deployQueueThunk (dappDisplayName, dappTemplateId) {
       return
     }
 
-    const queue = state.contracts.deploymentQueue
+    const queue = Object.values(state.contracts.deploymentQueue).sort(
+      (a, b) => {
+        return a.deploymentOrder - b.deploymentOrder
+      }
+    )
 
     const dappData = {
       displayName: dappDisplayName,
@@ -563,7 +565,7 @@ function deployQueueThunk (dappDisplayName, dappTemplateId) {
         state.web3,
         state.contracts.types,
         deployment.contractName,
-        deployment.constructorParams,
+        deployment.params,
         dappTemplateId
       )
 
@@ -571,22 +573,44 @@ function deployQueueThunk (dappDisplayName, dappTemplateId) {
 
         dappData.contractInstances.push(result.address)
 
+        if (deployment.children) {
+
+          deployment.children.forEach(args => {
+
+            const child = queue[args.deploymentOrder]
+            if (args.type === 'address') {
+              child.params[args.param].value = result.address
+            } else {
+
+              dispatch(getResetDeploymentQueueAction())
+              dispatch(getEndDeploymentAction())
+              dispatch(dappDeploymentResult(
+                false,
+                new Error(
+                  'deployment ' + i + ': ' + deployment.contractName + ' failed'
+                )
+              ))
+            }
+          })
+        }
+
       } else {
 
         dispatch(getResetDeploymentQueueAction())
         dispatch(getEndDeploymentAction())
-        dispatch(dappDeploymentFailure(new Error(
-          'deployment ' + i + ': ' + deployment.contractName + ' failed'
-        )))
-        dispatch(dappDeploymentEnd())
+        dispatch(dappDeploymentResult(
+          false,
+          new Error(
+            'deployment ' + i + ': ' + deployment.contractName + ' failed'
+          )
+        ))
         return
       }
     }
 
     dispatch(getResetDeploymentQueueAction())
     dispatch(getEndDeploymentAction())
-    dispatch(dappDeploymentSuccess(dappData))
-    dispatch(dappDeploymentEnd())
+    dispatch(dappDeploymentResult(true, dappData))
   }
 }
 
@@ -781,13 +805,26 @@ async function deployContract (
     return null
   }
 
+  let finalParams = []
+  if (!Array.isArray(constructorParams)) {
+
+    // convert object of params with data to array of param values
+    finalParams = Object.keys(constructorParams).sort((a, b) => {
+      return constructorParams[a].paramOrder - constructorParams[b].paramOrder
+    }).map(key => constructorParams[key].value)
+
+  } else {
+
+    finalParams = constructorParams
+  }
+
   const contractJSON = contractTypes[contractName].artifact
 
   let instance
   try {
     instance = await _deploy(
       contractJSON,
-      constructorParams,
+      finalParams,
       web3.provider,
       web3.account
     )
