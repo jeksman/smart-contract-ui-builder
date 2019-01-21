@@ -1,5 +1,5 @@
 {
-  "name": "smart-contract-ui-builder",
+  "name": "smart-contract-ui-builderr",
   "version": "0.0.0",
   "description": "Takes one or several smart contracts as inputs and represents their relationships as a graph",
   "private": true,
@@ -10,7 +10,7 @@
     "eject": "react-scripts eject"
   },
   "repository": {
-    "type": "git",
+    "type": "git"
   },
   "keywords": [
     "Ethereum",
@@ -29,8 +29,9 @@
     "bootstrap": "^3.3.7",
     "chain-end": "^0.2.0",
     "cytoscape": "^3.2.14",
-    "cytoscape-dagre": "^2.2.1",
     "immutable": "^3.8.2",
+    "lodash": "^4.17.10",
+    "rc-collapse": "^1.9.3",
     "react": "^16.4.1",
     "react-bootstrap": "^0.32.1",
     "react-dom": "^16.4.1",

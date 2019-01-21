@@ -1,28 +1,30 @@
 
 .Header {
-  background-color: #222;
-  height: 90px;
-  padding: 20px;
-  color: white;
   display: flex;
+  background-color: #333;
+  height: 90px;
+  color: white;
   flex-direction: row;
   justify-content: space-between;
-  z-index: 1;
+  align-items: center;
+  z-index: 2;
   position: fixed;
   width: 100%;
-  align-items: center;
 }
 
 .Header-title {
   font-size: 1.5em;
-  align-self: center;
+  padding-left: 20px;
 }
 
 .Header-items {
+  display: flex;
   flex-direction: column;
+  padding-right: 20px;
 }
 
 .Header-info {
+  display: flex;
   flex-direction: row;
   justify-content: flex-end;
 }
@@ -32,8 +34,9 @@
 }
 
 .Header-links {
+  /*display: flex; // eliminates space between for some reason
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: space-between;*/
 }
 
 .Header-link {
