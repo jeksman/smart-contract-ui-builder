@@ -1,31 +1,32 @@
 
 import PropTypes from 'prop-types'
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
+// import { withStyles } from '@material-ui/core/styles'
 import Divider from '@material-ui/core/Divider'
-import Typography from '@material-ui/core/Typography'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
-import ExpansionPanel from '@material-ui/core/ExpansionPanel'
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+
+import AppsIcon from '@material-ui/icons/Apps'
 import DeleteIcon from '@material-ui/icons/Delete'
-import SubjectIcon from '@material-ui/icons/Subject'
 import GetAppIcon from '@material-ui/icons/GetApp'
+import ListItemIcon from '@material-ui/core/ListItemIcon'
+import StorageIcon from '@material-ui/icons/Storage'
+import BuildIcon from '@material-ui/icons/Build'
 
-import { contractGraphTypes } from '../graphing/parseContract'
-
-import ContractInstancesList from './ContractInstancesList'
-
-import './style/ResourceMenu.css'
+import ContractResourceList from './ContractResourceList'
+import DappResourceList from './DappResourceList'
+import NestedList from './ui/NestedList'
+import ListButton from './ui/ListButton'
 
 export default class ResourceMenu extends Component {
 
   constructor (props) {
 
     super(props)
-    this.state = { storageHref: getStorageHref()}
+    this.state = {
+      storageHref: getStorageHref(),
+    }
   }
 
   componentDidUpdate (prevProps) {
@@ -35,35 +36,37 @@ export default class ResourceMenu extends Component {
     }
   }
 
+  handleParentListClick = id => {
+    this.setState(state => ({ [id]: !state[id] }))
+  }
+
   render () {
 
-    const classes = this.props.classes
-
-    const listHeadingStyle = {
-      whiteSpace: 'nowrap',
+    const graphResourceClasses = {
+      nested: this.props.classes.nested,
+      root: this.props.classes.root,
     }
 
-    const hasNoContractTypes =
-      !this.props.contractTypes ||
-      Object.keys(this.props.contractTypes).length === 0
-
-    const hasNoContractInstances =
-      !this.props.account ||
-      !this.props.networkId ||
-      !this.props.contractInstances ||
-      !this.props.contractInstances.hasOwnProperty(this.props.networkId)
-
     return (
-      <Fragment>
-        <div className="Header-links">
-
-        </div>
-        <Divider/>
-        <div className="ResourceMenu-delete-buttons">
-          <List>
-            <ListItem button
-
-            >
+      <div id="ResourceMenu-main" style={{overflowY: 'auto'}}>
+        <List disablePadding>
+          <NestedList
+            icon={(<BuildIcon />)}
+            displayText="Dev Tools"
+          >
+            <ListButton
+              disabled={!this.props.hasGraphs}
+              onClick={this.props.deleteAllGraphs}
+              icon={(<DeleteIcon />)}
+              displayText="Delete All Graphs" />
+            <ListButton
+              disabled={!this.props.selectedGraphId}
+              onClick={
+                () => this.props.deleteGraph(this.props.selectedGraphId)
+              }
+              icon={(<DeleteIcon />)}
+              displayText="Delete Selected Graph" />
+            <ListItem button>
               <ListItemIcon>
                 <GetAppIcon />
               </ListItemIcon>
@@ -81,99 +84,43 @@ export default class ResourceMenu extends Component {
                 </a>
               </ListItemText>
             </ListItem>
-            <Divider/>
-            <ListItem button
-              disabled={!this.props.selectedGraphId}
-              onClick={
-                () => this.props.deleteGraph(this.props.selectedGraphId)
-              }
-            >
-              <ListItemIcon>
-                <DeleteIcon />
-              </ListItemIcon>
-              <ListItemText primary="Delete Selected Graph" />
-            </ListItem>
-            <ListItem button
-              disabled={!this.props.hasGraphs}
-              onClick={this.props.deleteAllGraphs}
-            >
-              <ListItemIcon>
-                <DeleteIcon />
-              </ListItemIcon>
-              <ListItemText primary="Delete All Graphs" />
-            </ListItem>
-          </List>
-        </div>
+          </NestedList>
+        </List>
         <Divider />
-        <ExpansionPanel
-          id="ResourceMenu-contractTypes-panel"
-          disabled={hasNoContractTypes}
+        <NestedList
+          icon={(<StorageIcon />)}
+          displayText="Contracts"
         >
-          <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography className={classes.heading} style={listHeadingStyle}>
-              Contract Types
-            </Typography>
-          </ExpansionPanelSummary>
-          {hasNoContractTypes ? null : this.getContractTypesJSX()}
-        </ExpansionPanel>
-        <ExpansionPanel
-          id="ResourceMenu-contractInstances-panel"
-          disabled={hasNoContractInstances}
+          <ContractResourceList
+            classes={graphResourceClasses}
+            contractTypes={this.props.contractTypes}
+            instanceTypes={this.getInstanceTypes()}
+            selectContractAddress={this.props.selectContractAddress}
+            selectedContractAddress={this.props.selectedContractAddress}
+            addInstance={this.props.addInstance}
+            getCreateGraphParams={this.props.getCreateGraphParams}
+            createGraph={this.props.createGraph}
+            selectGraph={this.props.selectGraph}
+            selectedGraphId={this.props.selectedGraphId} />
+        </NestedList>
+        <NestedList
+          icon={(<AppsIcon />)}
+          displayText="Dapps"
         >
-          <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography className={classes.heading} style={listHeadingStyle}>
-              Contract Instances
-            </Typography>
-          </ExpansionPanelSummary>
-          {hasNoContractInstances ? null : this.getContractInstancesJSX()}
-        </ExpansionPanel>
-      </Fragment>
+          <DappResourceList
+            dapps={this.props.dapps} />
+        </NestedList>
+      </div>
     )
   }
 
-  /**
-   * Gets the JSX representing available contract types for deployment
-   * @return {jsx}  a list of available contract types
-   */
-  getContractTypesJSX = () => {
+  getInstanceTypes = () => {
 
-    const contractTypeNames = Object.keys(this.props.contractTypes)
-    contractTypeNames.sort()
-
-    const resourceMenu = this
-
-    const contractTypes = contractTypeNames.map(contractName => {
-
-      const currentGraphId =
-        resourceMenu.props.contractTypes[contractName][contractGraphTypes._constructor]
-
-      return (
-        <ContracTypeListButton
-          key={contractName}
-          contractName={contractName}
-          graphId={currentGraphId}
-          getCreateGraphParams={resourceMenu.props.getCreateGraphParams}
-          createGraph={resourceMenu.props.createGraph}
-          selectGraph={resourceMenu.props.selectGraph}
-          selectedGraphId={resourceMenu.props.selectedGraphId} />
-      )
-    })
-
-    return (
-      <List>
-        {contractTypes}
-      </List>
-    )
-  }
-
-  /**
-   * Gets the JSX representing deployed contracts (instances) for the current
-   * network and account
-   * @return {jsx}  TODO
-   */
-  getContractInstancesJSX = () => {
-
-    const _this = this
+    if (
+      !this.props.networkId ||
+      !this.props.contractInstances ||
+      !this.props.contractInstances[this.props.networkId]
+    ) return null
 
     // get all instances for current account and networkId by type
     const instanceTypes = {}
@@ -182,38 +129,24 @@ export default class ResourceMenu extends Component {
     ).forEach(address => {
 
       const instance =
-        _this.props.contractInstances[_this.props.networkId][address]
+        this.props.contractInstances[this.props.networkId][address]
 
-      if (instance.account === _this.props.account) {
+      if (instance.account === this.props.account) {
         if (instanceTypes[instance.type]) {
-          instanceTypes[instance.type][address] = !!instance.truffleInstance
+          instanceTypes[instance.type][address] = !!instance.truffleContract
         } else {
           instanceTypes[instance.type] = {
-            [address]: !!instance.truffleInstance,
+            [address]: !!instance.truffleContract,
           }
         }
       }
     })
 
-    if (Object.keys(instanceTypes).length === 0) return null // sanity
-
-    const _classes = {
-      nested: _this.props.classes.nested,
-      root: _this.props.classes.root,
+    if (Object.keys(instanceTypes).length === 0) {
+      throw new Error('no contract instances found')
     }
 
-    return (
-      <ContractInstancesList
-        classes={_classes}
-        contractTypes={_this.props.contractTypes}
-        instanceTypes={instanceTypes}
-        selectContractAddress={_this.props.selectContractAddress}
-        addInstance={_this.props.addInstance}
-        getCreateGraphParams={_this.props.getCreateGraphParams}
-        createGraph={_this.props.createGraph}
-        selectGraph={_this.props.selectGraph}
-        selectedGraphId={_this.props.selectedGraphId} />
-    )
+    return instanceTypes
   }
 }
 
@@ -231,48 +164,10 @@ ResourceMenu.propTypes = {
   selectGraph: PropTypes.func,
   selectedGraphId: PropTypes.string,
   selectContractAddress: PropTypes.func,
+  selectedContractAddress: PropTypes.string,
   hasGraphs: PropTypes.bool,
   drawerOpen: PropTypes.bool,
-}
-
-/* subcomponents */
-
-class ContracTypeListButton extends Component {
-
-  render () {
-    return (
-      <ListItem button
-        disabled={this.props.selectedGraphId &&
-          this.props.selectedGraphId === this.props.graphId}
-        onClick={this.onContractTypeClick}
-      >
-        <ListItemIcon>
-          <SubjectIcon />
-        </ListItemIcon>
-        <ListItemText primary={this.props.contractName} />
-      </ListItem>
-    )
-  }
-
-  onContractTypeClick = () => {
-    if (this.props.graphId) {
-      this.props.selectGraph(this.props.graphId)
-    } else {
-      this.props.createGraph(this.props.getCreateGraphParams(
-        contractGraphTypes._constructor,
-        { contractName: this.props.contractName }
-      ))
-    }
-  }
-}
-
-ContracTypeListButton.propTypes = {
-  contractName: PropTypes.string,
-  createGraph: PropTypes.func,
-  getCreateGraphParams: PropTypes.func,
-  selectGraph: PropTypes.func,
-  selectedGraphId: PropTypes.string,
-  graphId: PropTypes.string,
+  dapps: PropTypes.object,
 }
 
 /**

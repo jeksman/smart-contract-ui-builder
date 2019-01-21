@@ -3,15 +3,15 @@
  * https://github.com/mui-org/material-ui/tree/master/docs/src/pages/page-layout-examples/dashboard
  */
 
-const drawerWidth = 240
+const drawerWidth = 260
 
 const appStyles = theme => ({
   root: {
     display: 'flex',
   },
-  toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
-  },
+  // toolbar: {
+  //   paddingRight: 24, // keep right padding when drawer closed
+  // },
   toolbarIcon: {
     display: 'flex',
     alignItems: 'center',
@@ -76,6 +76,9 @@ const appStyles = theme => ({
   },
   tableContainer: {
     height: 320,
+  },
+  listItemText: {
+    paddingLeft: 0,
   },
 })
 
