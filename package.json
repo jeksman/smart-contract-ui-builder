@@ -31,13 +31,15 @@
   },
   "homepage": "https://gitlab.com/eugenekyselev/smart-contract-ui-builder#readme",
   "dependencies": {
+
     "@material-ui/core": "^1.4.2",
     "ajv": "^6.5.2",
     "bootstrap": "^3.3.7",
     "chain-end": "^0.5.0",
-    "cytoscape": "^3.2.14",
-    "eslint": "^5.2.0",
+    "dagre": "^0.8.2",
+    "eslint": "^4.1.1",
     "immutable": "^3.8.2",
+    "jointjs": "^2.1.4",
     "jquery": "^3.3.1",
     "lodash": "^4.17.10",
     "popper.js": "^1.14.4",
@@ -53,6 +55,7 @@
     "redux": "^4.0.0",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
+    "svg-pan-zoom": "^3.5.3",
     "uuid": "^3.3.2",
     "web3": "^1.0.0-beta.34"
   },

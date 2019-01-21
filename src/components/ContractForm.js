@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import Form from 'react-jsonschema-form'
 
 import DropdownMenu from './DropdownMenu'
-import { contractGraphTypes } from '../graphing/contractParser'
+import { contractGraphTypes } from '../graphing/parseContract'
 
 import './style/ContractForm.css'
 
@@ -61,10 +61,10 @@ export default class ContractForm extends Component {
         uiSchema={formData.uiSchema}
         onChange={log('changed')}
         onSubmit={formData => {
-            
+
             const params = [
               this.props.contractAddress,
-              formData.schema.abiName
+              formData.schema.abiName,
             ]
 
             if (Object.keys(formData.formData).length > 0) {
@@ -114,7 +114,7 @@ ContractForm.propTypes = {
   callInstance: PropTypes.func,
   contractName: PropTypes.string,
   graphType: PropTypes.string,
-  nodes: PropTypes.array,
+  nodes: PropTypes.object,
   deploy: PropTypes.func,
   closeContractForm: PropTypes.func,
   selectContractFunction: PropTypes.func,
@@ -125,13 +125,20 @@ ContractForm.propTypes = {
 
 function getFunctionIds (nodes) {
 
-  const functions = nodes.filter(node => node.data.type === 'function')
-    .map(node => {
-      return {
-        id: node.data.id,
-        name: node.data.nodeName,
-      }
-    })
+  const functions = []
+  Object.values(nodes).forEach( node => {
+    if (node.type === 'function') {
+      functions.push({
+        id: node.id,
+        name: node.displayName,
+      })
+    }
+  })
+
+  functions.sort((a, b) => {
+    if (a.name === b.name) return 0 // sanity
+    return a.name < b.name ? -1 : 1
+  })
 
   return functions
 }
@@ -144,13 +151,21 @@ function getFunctionIds (nodes) {
  */
 function generateFunctionForm (nodes, functionId = null) {
 
-  let functionNodes
+  const functionNodes = []
 
-  functionId
-  ? functionNodes = nodes.filter(node => {
-      return node.data.id === functionId || node.data.parent === functionId
+  if (!functionId) { // all nodes belong to function
+
+    Object.values(nodes).forEach(node => {
+      functionNodes.push(node)
     })
-  : functionNodes = nodes
+  } else { // only certain nodes belong to function
+
+    Object.values(nodes).forEach(node => {
+      if (node.id === functionId || node.parent === functionId) {
+        functionNodes.push(node)
+      }
+    })
+  }
 
   const schema = {
     title: null, // form title
@@ -169,18 +184,18 @@ function generateFunctionForm (nodes, functionId = null) {
   functionNodes.forEach(node => {
 
     // contract name = form title
-    if (node.data.type === 'contract' || node.data.type === 'function') {
+    if (node.type === 'contract' || node.type === 'function') {
 
-      schema.title = node.data.nodeName
-      schema.abiName = node.data.abiName
+      schema.title = node.displayName
+      schema.abiName = node.abiName
 
     } else {
 
       // parse node data to create corresponding field object
       const field = {
-        type: parseSolidityType(node.data.abi.type),
-        title: node.data.nodeName,
-        parameterName: node.data.abi.name,
+        type: parseSolidityType(node.abiType),
+        title: node.displayName,
+        parameterName: node.abiName,
       }
 
       schema.properties[field.parameterName] = field
@@ -189,7 +204,7 @@ function generateFunctionForm (nodes, functionId = null) {
       // order is retained from ABI and is correct for the web3.eth call
       uiSchema['ui:order'].push(field.parameterName)
       uiSchema[field.parameterName] = {
-        'ui:placeholder': node.data.abi.type + ':' + node.data.abi.name,
+        'ui:placeholder': node.abiType + ':' + node.abiName,
       }
     }
   })

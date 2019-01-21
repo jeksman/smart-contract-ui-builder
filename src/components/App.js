@@ -45,11 +45,12 @@ class App extends Component {
   constructor (props) {
     super(props)
     this.props.getWeb3()
+    this.graphContainerRef = React.createRef()
+    this.state = {
+      graphHeight: null,
+      graphWidth: null,
+    }
   }
-
-  // componentWillReceiveProps (nextProps) {
-  //   console.log(nextProps)
-  // }
 
   componentDidCatch (error, errorInfo) {
     // Catch errors in any components below and, in the future, re-render with error message
@@ -87,12 +88,13 @@ class App extends Component {
                 selectContractAddress={this.props.selectContractAddress}
                 hasGraphs={this.props.hasGraphs} />
             </div>
-            <div className="App-graph-container" >
+            <div className="App-graph-container" ref={this.graphContainerRef} >
               {
                 currentGraph
                 ? <Grapher
                     graph={currentGraph}
-                    openContractForm={this.props.openContractForm} />
+                    openContractForm={this.props.openContractForm}
+                    graphContainer={this.graphContainerRef} />
                 : <h2 className="App-no-graph-label">Please select a graph</h2>
               }
             </div>
@@ -110,7 +112,7 @@ class App extends Component {
               currentGraph
               ? <ContractForm
                   contractAddress={this.props.selectedContractAddress}
-                  nodes={currentGraph.config.elements.nodes}
+                  nodes={currentGraph.elements.nodes}
                   contractName={currentGraph.name}
                   graphType={currentGraph.type}
                   deploy={this.props.deploy}
@@ -194,7 +196,7 @@ function mapDispatchToProps (dispatch) {
       dispatch(deploy(contractName, constructorParams)),
     addInstance: (contractName, address) =>
       dispatch(addInstance(contractName, address)),
-    callInstance: (address, functionName, params=null, sender=null) =>
+    callInstance: (address, functionName, params = null, sender = null) =>
       dispatch(callInstance(address, functionName, params, sender)),
     selectContractAddress: address => dispatch(selectContractAddress(address)),
     // grapher
