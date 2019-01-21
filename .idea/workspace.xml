@@ -6,14 +6,11 @@
       <change beforePath="$PROJECT_DIR$/package-lock.json" afterPath="$PROJECT_DIR$/package-lock.json" />
       <change beforePath="$PROJECT_DIR$/package.json" afterPath="$PROJECT_DIR$/package.json" />
       <change beforePath="$PROJECT_DIR$/src/components/App.js" afterPath="$PROJECT_DIR$/src/components/App.js" />
-      <change beforePath="$PROJECT_DIR$/src/components/Header.js" afterPath="$PROJECT_DIR$/src/components/Header.js" />
-      <change beforePath="$PROJECT_DIR$/src/components/ResourceMenu.js" afterPath="$PROJECT_DIR$/src/components/ResourceMenu.js" />
-      <change beforePath="$PROJECT_DIR$/src/components/style/App.css" afterPath="$PROJECT_DIR$/src/components/style/App.css" />
-      <change beforePath="$PROJECT_DIR$/src/components/style/ContractForm.css" afterPath="$PROJECT_DIR$/src/components/style/ContractForm.css" />
-      <change beforePath="$PROJECT_DIR$/src/components/style/Header.css" afterPath="$PROJECT_DIR$/src/components/style/Header.css" />
-      <change beforePath="$PROJECT_DIR$/src/components/style/ResourceMenu.css" afterPath="$PROJECT_DIR$/src/components/style/ResourceMenu.css" />
-      <change beforePath="$PROJECT_DIR$/src/graphing/graphTemplate.js" afterPath="$PROJECT_DIR$/src/graphing/graphTemplate.js" />
-      <change beforePath="$PROJECT_DIR$/src/redux/reducers/web3.js" afterPath="$PROJECT_DIR$/src/redux/reducers/web3.js" />
+      <change beforePath="$PROJECT_DIR$/src/components/Grapher.js" afterPath="$PROJECT_DIR$/src/components/Grapher.js" />
+      <change beforePath="$PROJECT_DIR$/src/graphing/contractParser.js" afterPath="$PROJECT_DIR$/src/graphing/contractParser.js" />
+      <change beforePath="$PROJECT_DIR$/src/redux/reducers/contracts.js" afterPath="$PROJECT_DIR$/src/redux/reducers/contracts.js" />
+      <change beforePath="$PROJECT_DIR$/src/redux/reducers/grapher.js" afterPath="$PROJECT_DIR$/src/redux/reducers/grapher.js" />
+      <change beforePath="$PROJECT_DIR$/src/redux/reducers/ui.js" afterPath="$PROJECT_DIR$/src/redux/reducers/ui.js" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -27,8 +24,8 @@
       <file leaf-file-name="package.json" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/package.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="390">
-              <caret line="26" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+            <state relative-caret-position="373">
+              <caret line="25" column="53" lean-forward="false" selection-start-line="25" selection-start-column="53" selection-end-line="25" selection-end-column="53" />
               <folding />
             </state>
           </provider>
@@ -38,7 +35,7 @@
         <entry file="file://$PROJECT_DIR$/src/redux/reducers/contracts.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="403">
-              <caret line="177" column="0" lean-forward="false" selection-start-line="177" selection-start-column="0" selection-end-line="177" selection-end-column="0" />
+              <caret line="215" column="0" lean-forward="false" selection-start-line="215" selection-start-column="0" selection-end-line="215" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -49,7 +46,9 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
               <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
+              <folding>
+                <marker date="1548062052907" expanded="true" signature="1727:1731" ph="{&quot;type&quot;: ACTIONS.PARSE_CONTRACT...}" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -343,7 +342,7 @@
       <option name="presentableId" value="Default" />
       <updated>1547632775780</updated>
       <workItem from="1547632777524" duration="802000" />
-      <workItem from="1547633844931" duration="10666000" />
+      <workItem from="1547633844931" duration="10781000" />
     </task>
     <task id="LOCAL-00001" summary="add react-router-dom, add basic dynamic form generations. minor refactoring">
       <created>1547717914471</created>
@@ -401,11 +400,18 @@
       <option name="project" value="LOCAL" />
       <updated>1547805043482</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="add instance and contract type items to menu. (still no functionality)">
+      <created>1548062039641</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1548062039641</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="11468000" />
+    <option name="totallyTimeSpent" value="11583000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -418,13 +424,14 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="428" y="23" width="1440" height="810" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32867134" sideWeight="0.49713877" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32867134" sideWeight="0.5286123" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32867134" sideWeight="0.5286123" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32867134" sideWeight="0.47997138" order="7" side_tool="false" content_ui="tabs" />
@@ -489,7 +496,8 @@
     <MESSAGE value="listen for account/network changes, add resource menu component" />
     <MESSAGE value="enable saving of local storage, minor edits" />
     <MESSAGE value="convert form to modal popup, remove react router components" />
-    <option name="LAST_COMMIT_MESSAGE" value="convert form to modal popup, remove react router components" />
+    <MESSAGE value="add instance and contract type items to menu. (still no functionality)" />
+    <option name="LAST_COMMIT_MESSAGE" value="add instance and contract type items to menu. (still no functionality)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -596,7 +604,7 @@
         <state relative-caret-position="-92">
           <caret line="36" column="15" lean-forward="false" selection-start-line="36" selection-start-column="15" selection-end-line="36" selection-end-column="15" />
           <folding>
-            <marker date="1548061847107" expanded="true" signature="4239:4245" ph="//..." />
+            <marker date="1548062052905" expanded="true" signature="4310:4316" ph="//..." />
           </folding>
         </state>
       </provider>
@@ -783,7 +791,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <marker date="1548062052907" expanded="true" signature="1727:1731" ph="{&quot;type&quot;: ACTIONS.PARSE_CONTRACT...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -798,15 +808,15 @@
     <entry file="file://$PROJECT_DIR$/src/redux/reducers/contracts.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="403">
-          <caret line="177" column="0" lean-forward="false" selection-start-line="177" selection-start-column="0" selection-end-line="177" selection-end-column="0" />
+          <caret line="215" column="0" lean-forward="false" selection-start-line="215" selection-start-column="0" selection-end-line="215" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="26" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+        <state relative-caret-position="373">
+          <caret line="25" column="53" lean-forward="false" selection-start-line="25" selection-start-column="53" selection-end-line="25" selection-end-column="53" />
           <folding />
         </state>
       </provider>
