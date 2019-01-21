@@ -88,7 +88,6 @@ const config = {
 
   layout: {
     name: 'grid',
-    // padding: 5
   },
 }
 
@@ -97,7 +96,7 @@ const style = {
   width: '100%',
   position: 'fixed',
   paddingLeft: '180px', // TODO: set dynamically to equal resource menu width
-  paddingTop: '90px', // TODO: set dynamically to equal header height
+  paddingTop: '0px',
   backgroundColor: '#F8F8F8',
   // 'zIndex': '-10', // doesn't seem to do anything
 }

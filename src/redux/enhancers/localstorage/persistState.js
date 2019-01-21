@@ -2,6 +2,8 @@
  * https://github.com/elgerlambert/redux-localstorage
  */
 
+import { Map, fromJS } from 'immutable'
+
 import createSlicer from './createSlicer.js'
 import mergeState from './util/mergeState.js'
 
@@ -51,7 +53,16 @@ export default function persistState (paths, config) {
 
     try {
       persistedState = deserialize(localStorage.getItem(key))
-      finalInitialState = merge(initialState, persistedState)
+      if (persistedState) {
+        Object.entries(persistedState.grapher.graphs).forEach( // TODO: temp immutable grapher
+          ([key, value]) => {
+            persistedState.grapher.graphs[key] = fromJS(value)
+          }
+        )
+        finalInitialState = merge(initialState, persistedState)
+      } else {
+        console.log('No persisted state found. Initializing default state.')
+      }
     } catch (e) {
       console.warn('Failed to retrieve initialize state from localStorage:', e)
     }
@@ -67,6 +78,8 @@ export default function persistState (paths, config) {
         localStorage.setItem(key, serialize(subset, (key, value) => {
           if (cfg.excludeKeys.includes(key)) {
             return undefined
+          } else if (value instanceof Map) { // TODO: temp immutable grapher
+            return value.fromJS()
           } else return value
         }))
       } catch (e) {

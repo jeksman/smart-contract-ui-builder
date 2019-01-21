@@ -6,21 +6,18 @@
       <change beforePath="$PROJECT_DIR$/package.json" afterPath="$PROJECT_DIR$/package.json" />
       <change beforePath="$PROJECT_DIR$/src/components/App.js" afterPath="$PROJECT_DIR$/src/components/App.js" />
       <change beforePath="$PROJECT_DIR$/src/components/ContractForm.js" afterPath="$PROJECT_DIR$/src/components/ContractForm.js" />
+      <change beforePath="$PROJECT_DIR$/src/components/Grapher.js" afterPath="$PROJECT_DIR$/src/components/Grapher.js" />
       <change beforePath="$PROJECT_DIR$/src/components/Header.js" afterPath="$PROJECT_DIR$/src/components/Header.js" />
       <change beforePath="$PROJECT_DIR$/src/components/ResourceMenu.js" afterPath="$PROJECT_DIR$/src/components/ResourceMenu.js" />
       <change beforePath="$PROJECT_DIR$/src/components/style/App.css" afterPath="$PROJECT_DIR$/src/components/style/App.css" />
       <change beforePath="$PROJECT_DIR$/src/components/style/Header.css" afterPath="$PROJECT_DIR$/src/components/style/Header.css" />
+      <change beforePath="$PROJECT_DIR$/src/components/style/ResourceMenu.css" afterPath="$PROJECT_DIR$/src/components/style/ResourceMenu.css" />
+      <change beforePath="$PROJECT_DIR$/src/graphing/contractParser.js" afterPath="$PROJECT_DIR$/src/graphing/contractParser.js" />
+      <change beforePath="$PROJECT_DIR$/src/graphing/graphTemplate.js" afterPath="$PROJECT_DIR$/src/graphing/graphTemplate.js" />
       <change beforePath="$PROJECT_DIR$/src/redux/configureStore.js" afterPath="$PROJECT_DIR$/src/redux/configureStore.js" />
-      <change beforePath="$PROJECT_DIR$/src/redux/enhancers/localstorage/getSubset.js" afterPath="$PROJECT_DIR$/src/redux/enhancers/localstorage/getSubset.js" />
       <change beforePath="$PROJECT_DIR$/src/redux/enhancers/localstorage/persistState.js" afterPath="$PROJECT_DIR$/src/redux/enhancers/localstorage/persistState.js" />
-      <change beforePath="$PROJECT_DIR$/src/redux/enhancers/localstorage/util/mergeState.js" afterPath="$PROJECT_DIR$/src/redux/enhancers/localstorage/util/mergeState.js" />
       <change beforePath="$PROJECT_DIR$/src/redux/reducers/contracts.js" afterPath="$PROJECT_DIR$/src/redux/reducers/contracts.js" />
       <change beforePath="$PROJECT_DIR$/src/redux/reducers/grapher.js" afterPath="$PROJECT_DIR$/src/redux/reducers/grapher.js" />
-      <change beforePath="$PROJECT_DIR$/src/redux/reducers/renderErrors.js" afterPath="$PROJECT_DIR$/src/redux/reducers/renderErrors.js" />
-      <change beforePath="$PROJECT_DIR$/src/redux/reducers/root.js" afterPath="$PROJECT_DIR$/src/redux/reducers/root.js" />
-      <change beforePath="$PROJECT_DIR$/src/redux/reducers/ui.js" afterPath="$PROJECT_DIR$/src/redux/reducers/ui.js" />
-      <change beforePath="$PROJECT_DIR$/src/redux/reducers/web3.js" afterPath="$PROJECT_DIR$/src/redux/reducers/web3.js" />
-      <change beforePath="$PROJECT_DIR$/src/tests/grapher.spec.js" afterPath="$PROJECT_DIR$/src/tests/grapher.spec.js" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -34,8 +31,8 @@
       <file leaf-file-name="package.json" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/package.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="17" column="10" lean-forward="true" selection-start-line="17" selection-start-column="10" selection-end-line="17" selection-end-column="10" />
+            <state relative-caret-position="420">
+              <caret line="28" column="0" lean-forward="true" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -45,7 +42,7 @@
         <entry file="file://$PROJECT_DIR$/src/redux/reducers/contracts.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="403">
-              <caret line="317" column="0" lean-forward="false" selection-start-line="317" selection-start-column="0" selection-end-line="317" selection-end-column="0" />
+              <caret line="343" column="0" lean-forward="false" selection-start-line="343" selection-start-column="0" selection-end-line="343" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -57,7 +54,7 @@
             <state relative-caret-position="0">
               <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding>
-                <marker date="1548062160318" expanded="true" signature="5128:5132" ph="{&quot;type&quot;: ACTIONS.PARSE_CONTRACT...}" />
+                <marker date="1548062325908" expanded="true" signature="6654:6658" ph="{&quot;type&quot;: ACTIONS.PARSE_CONTRACT...}" />
               </folding>
             </state>
           </provider>
@@ -142,7 +139,7 @@
     <handled-path value="$PROJECT_DIR$/node_modules" />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="428" />
+    <option name="x" value="653" />
     <option name="y" value="23" />
     <option name="width" value="1440" />
     <option name="height" value="810" />
@@ -350,7 +347,7 @@
       <option name="presentableId" value="Default" />
       <updated>1547632775780</updated>
       <workItem from="1547632777524" duration="802000" />
-      <workItem from="1547633844931" duration="10883000" />
+      <workItem from="1547633844931" duration="11044000" />
     </task>
     <task id="LOCAL-00001" summary="add react-router-dom, add basic dynamic form generations. minor refactoring">
       <created>1547717914471</created>
@@ -422,11 +419,18 @@
       <option name="project" value="LOCAL" />
       <updated>1548062145273</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="replace deplyoer object with deploy func, decouple graphs from contracts, generate graphs as-needed, normalized uuid storage of graphs">
+      <created>1548062292892</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1548062292892</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="11685000" />
+    <option name="totallyTimeSpent" value="11846000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -438,7 +442,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="428" y="23" width="1440" height="810" extended-state="0" />
+    <frame x="653" y="23" width="1440" height="810" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -513,7 +517,8 @@
     <MESSAGE value="convert form to modal popup, remove react router components" />
     <MESSAGE value="add instance and contract type items to menu. (still no functionality)" />
     <MESSAGE value="redefining graph and contract concepts, wip" />
-    <option name="LAST_COMMIT_MESSAGE" value="redefining graph and contract concepts, wip" />
+    <MESSAGE value="replace deplyoer object with deploy func, decouple graphs from contracts, generate graphs as-needed, normalized uuid storage of graphs" />
+    <option name="LAST_COMMIT_MESSAGE" value="replace deplyoer object with deploy func, decouple graphs from contracts, generate graphs as-needed, normalized uuid storage of graphs" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -620,7 +625,7 @@
         <state relative-caret-position="-92">
           <caret line="36" column="15" lean-forward="false" selection-start-line="36" selection-start-column="15" selection-end-line="36" selection-end-column="15" />
           <folding>
-            <marker date="1548062160315" expanded="true" signature="5102:5108" ph="//..." />
+            <marker date="1548062325905" expanded="true" signature="5899:5905" ph="//..." />
           </folding>
         </state>
       </provider>
@@ -740,7 +745,7 @@
         <state relative-caret-position="-1258">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1548062160315" expanded="true" signature="3955:3979" ph="..." />
+            <marker date="1548062325905" expanded="true" signature="4328:4352" ph="..." />
           </folding>
         </state>
       </provider>
@@ -806,7 +811,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1548062160318" expanded="true" signature="5128:5132" ph="{&quot;type&quot;: ACTIONS.PARSE_CONTRACT...}" />
+            <marker date="1548062325908" expanded="true" signature="6654:6658" ph="{&quot;type&quot;: ACTIONS.PARSE_CONTRACT...}" />
           </folding>
         </state>
       </provider>
@@ -822,15 +827,15 @@
     <entry file="file://$PROJECT_DIR$/src/redux/reducers/contracts.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="403">
-          <caret line="317" column="0" lean-forward="false" selection-start-line="317" selection-start-column="0" selection-end-line="317" selection-end-column="0" />
+          <caret line="343" column="0" lean-forward="false" selection-start-line="343" selection-start-column="0" selection-end-line="343" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="17" column="10" lean-forward="true" selection-start-line="17" selection-start-column="10" selection-end-line="17" selection-end-column="10" />
+        <state relative-caret-position="420">
+          <caret line="28" column="0" lean-forward="true" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
           <folding />
         </state>
       </provider>

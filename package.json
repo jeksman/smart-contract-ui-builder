@@ -26,6 +26,7 @@
   "author": "Eugene Kyselev <admin@profsite.com.ua>",
   "license": "MIT",
   "dependencies": {
+
     "@material-ui/core": "^1.4.2",
     "ajv": "^6.5.2",
     "bootstrap": "^3.3.7",
@@ -50,6 +51,7 @@
     "web3": "^1.0.0-beta.34"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "eslint-plugin-chai": "0.0.1",
     "eslint-plugin-json": "^1.2.0",
     "eslint-plugin-mocha": "^5.1.0",

@@ -3,10 +3,18 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import Collapse, { Panel } from 'rc-collapse'
 
+import { contractGraphTypes } from '../graphing/contractParser'
+
 import 'rc-collapse/assets/index.css'
 import './style/ResourceMenu.css'
 
 export default class ResourceMenu extends Component {
+
+  constructor (props) {
+    super(props)
+    this.getContractInstancesJSX = this.getContractInstancesJSX.bind(this)
+    this.getContractsJSX = this.getContractsJSX.bind(this)
+  }
 
   // componentDidMount () {
   //   this.setState((prevProps, props) => {
@@ -17,29 +25,130 @@ export default class ResourceMenu extends Component {
   render () {
     return (
       <div className="ResourceMenu" >
+        <div className="ResourceMenu-delete-buttons">
+          <button
+            className="ResourceMenu-button"
+            disabled={!this.props.selectedGraphId}
+            onClick={() => this.props.deleteGraph(this.props.selectedGraphId)}
+          >
+            Delete Selected Graph
+          </button>
+          <button
+            className="ResourceMenu-button"
+            disabled={!this.props.hasGraphs}
+            onClick={this.props.deleteAllGraphs}
+          >
+            Delete All Graphs
+          </button>
+        </div>
         <Collapse accordion={true} >
           <Panel
             header="Contract Types"
             headerClass="ResourceMenu-panel-outer"
           >
-           {
-            getContractsJSX(
-              this.props.contractTypes,
-              this.props.getCreateGraphParams,
-              this.props.createGraph,
-              this.props.selectGraph
-            )
-           }
+           {this.getContractsJSX()}
           </Panel>
-          {
-            getContractInstancesJSX(
-              this.props.account,
-              this.props.networkId,
-              this.props.contractInstances
-            )
-          }
+          {this.getContractInstancesJSX()}
         </Collapse>
       </div>
+    )
+  }
+
+  /**
+   * Gets the JSX representing available contract types for deployment
+   * @return {jsx}  one <ContractTypeButton> for every contract type in props
+   */
+  getContractsJSX () {
+
+    if (
+      !this.props.contractTypes ||
+      Object.keys(this.props.contractTypes
+    ) === 0) {
+      return <p>Please add some contract types.</p>
+    }
+
+    const contractTypeNames = Object.keys(this.props.contractTypes)
+    contractTypeNames.sort()
+
+    const thisTarget = this
+    const contracts = []
+    contractTypeNames.forEach(contractName => {
+
+      const graphId =
+        thisTarget.props.contractTypes[contractName][contractGraphTypes._constructor]
+
+      contracts.push(
+        <ContractTypeButton
+          key={contractName}
+          contractName={contractName}
+          graphId={graphId}
+          getCreateGraphParams={thisTarget.props.getCreateGraphParams}
+          createGraph={thisTarget.props.createGraph}
+          selectGraph={thisTarget.props.selectGraph}
+          selectedGraphId={thisTarget.props.selectedGraphId} />
+      )
+    })
+    return contracts
+  }
+
+  /**
+   * Gets the JSX representing deployed contracts (instances) for the current
+   * network and account
+   * @return {jsx}  Panel with one Collapse child for every deployed instance
+   *                associated with the account and network id in props
+   */
+  getContractInstancesJSX () {
+
+    if (
+      !this.props.account ||
+      !this.props.networkId ||
+      !this.props.contractInstances ||
+      !this.props.contractInstances.hasOwnProperty(this.props.networkId)
+    ) return
+
+    const _this = this
+    const instances = []
+    Object.keys(
+      this.props.contractInstances[_this.props.networkId]).forEach(address => {
+
+      const instance =
+        _this.props.contractInstances[_this.props.networkId][address]
+      if (instance.account === _this.props.account) {
+
+        // instance.type is the same as contractName
+        const completeAbiGraphId =
+          _this.props.contractTypes[instance.type][contractGraphTypes.completeAbi]
+        const functionsGraphId =
+          _this.props.contractTypes[instance.type][contractGraphTypes.functions]
+
+        instances.push(
+          <Collapse key={address + ':collapse'} >
+            <Panel
+              key={address + ':panel'}
+              header={instance.type}
+              headerClass="ResourceMenu-panel-inner"
+            >
+              <p>{address}</p>
+              <ContractInstanceButtons
+                contractName={instance.type}
+                completeAbiGraphId={completeAbiGraphId}
+                functionsGraphId={functionsGraphId}
+                getCreateGraphParams={_this.props.getCreateGraphParams}
+                createGraph={_this.props.createGraph}
+                selectGraph={_this.props.selectGraph}
+                selectedGraphId={_this.props.selectedGraphId} />
+            </Panel>
+          </Collapse>
+        )
+      }
+    })
+
+    return (
+      instances.length > 0
+      ? <Panel header="Deployed Contracts" headerClass="ResourceMenu-panel-outer">
+          {instances}
+        </Panel>
+      : undefined
     )
   }
 }
@@ -50,9 +159,15 @@ ResourceMenu.propTypes = {
   contractInstances: PropTypes.object,
   contractTypes: PropTypes.object,
   createGraph: PropTypes.func,
+  deleteGraph: PropTypes.func,
+  deleteAllGraphs: PropTypes.func,
   getCreateGraphParams: PropTypes.func,
   selectGraph: PropTypes.func,
+  selectedGraphId: PropTypes.string,
+  hasGraphs: PropTypes.bool,
 }
+
+/* subcomponents */
 
 class ContractTypeButton extends Component {
 
@@ -65,129 +180,92 @@ class ContractTypeButton extends Component {
     return (
       <button
         className="ResourceMenu-button"
-        onClick={this._onClick} >
+        disabled={this.props.selectedGraphId &&
+          this.props.selectedGraphId === this.props.graphId}
+        onClick={this._onClick}
+      >
         {this.props.contractName}
       </button>
     )
   }
 
   _onClick () {
-    this.props.onContractTypeClick(
-      this.props.contractName,
-      this.props.graphId,
-      this.props.getCreateGraphParams,
-      this.props.createGraph,
-      this.props.selectGraph
-    )
+    if (this.props.graphId) {
+      this.props.selectGraph(this.props.graphId)
+    } else {
+      this.props.createGraph(this.props.getCreateGraphParams(
+        'contract', 'constructor', this.props.contractName))
+    }
   }
 }
 
 ContractTypeButton.propTypes = {
   contractName: PropTypes.string,
-  onContractTypeClick: PropTypes.func,
   createGraph: PropTypes.func,
   getCreateGraphParams: PropTypes.func,
   selectGraph: PropTypes.func,
+  selectedGraphId: PropTypes.string,
   graphId: PropTypes.string,
 }
 
-function onContractTypeClick (
-  contractName,
-  graphId,
-  getCreateGraphParams,
-  createGraph,
-  selectGraph
-  ) {
+class ContractInstanceButtons extends Component {
 
-  if (graphId) {
-    selectGraph(graphId)
-  } else {
-    createGraph(getCreateGraphParams(
-      'contract', 'constructor', contractName))
-  }
-}
-
-/**
- * Gets the JSX representing available contract types for deployment
- * @param  {object} contractTypes contract types
- * @return {jsx}                  a number of <a> elements
- */
-function getContractsJSX (
-  contractTypes,
-  getCreateGraphParams,
-  createGraph,
-  selectGraph
-  ) {
-
-  if (!contractTypes || Object.keys(contractTypes) === 0) {
-    return <p>Please add some contract types.</p>
+  constructor (props) {
+    super(props)
+    this.onCompleteAbiClick = this.onCompleteAbiClick.bind(this)
+    this.onFunctionsClick = this.onFunctionsClick.bind(this)
   }
 
-  const contractTypeNames = Object.keys(contractTypes)
-  contractTypeNames.sort()
-
-  // TODO: alter this so that it calls selectGraphThunk on the id
-  // if it exists
-  const contracts = []
-  contractTypeNames.forEach(contractName => {
-
-    const graphId = contractTypes[contractName].constructorGraphId
-
-    contracts.push(
-      <ContractTypeButton
-        key={contractName}
-        contractName={contractName}
-        onContractTypeClick={onContractTypeClick}
-        graphId={graphId}
-        getCreateGraphParams={getCreateGraphParams}
-        createGraph={createGraph}
-        selectGraph={selectGraph} />
+  render () {
+    return (
+      <div>
+        <button
+          className="ResourceMenu-button"
+          disabled={this.props.selectedGraphId &&
+            this.props.selectedGraphId === this.props.completeAbiGraphId}
+          onClick={this.onCompleteAbiClick}
+        >
+          Complete ABI
+        </button>
+        <button
+          className="ResourceMenu-button"
+          disabled={this.props.selectedGraphId &&
+            this.props.selectedGraphId === this.props.functionsGraphId}
+          onClick={this.onFunctionsClick}
+        >
+          Functions
+        </button>
+      </div>
     )
-  })
-  return contracts
+  }
+
+  onCompleteAbiClick () {
+    if (this.props.completeAbiGraphId) {
+      this.props.selectGraph(this.props.completeAbiGraphId)
+    } else {
+      this.props.createGraph(this.props.getCreateGraphParams(
+        'contract', 'completeAbi', this.props.contractName))
+    }
+  }
+
+  onFunctionsClick () {
+    if (this.props.functionsGraphId) {
+      this.props.selectGraph(this.props.functionsGraphId)
+    } else {
+      this.props.createGraph(this.props.getCreateGraphParams(
+      'contract', 'functions', this.props.contractName))
+    }
+  }
 }
 
-/**
- * Gets the JSX representing deployed contracts (instances) for the current
- * network and account
- * @param  {string} account           the current web3 account
- * @param  {string} networkId         the current web3 network id
- * @param  {object} contractInstances contract instances stored in state
- * @return {jsx}                      Panel with Collapse children
- */
-function getContractInstancesJSX (account, networkId, contractInstances) {
-
-  if (
-    !account ||
-    !networkId ||
-    !contractInstances ||
-    !contractInstances.hasOwnProperty(networkId)
-  ) return
-
-  const instances = []
-  Object.keys(contractInstances[networkId]).forEach(address => {
-
-    const instance = contractInstances[networkId][address]
-    if (instance.account === account) {
-      instances.push(
-        <Collapse key={address + ':collapse'} >
-          <Panel
-            key={address + ':panel'}
-            header={instance.type}
-            headerClass="ResourceMenu-panel-inner"
-          >
-            <p>Address: {address}</p>
-          </Panel>
-        </Collapse>
-      )
-    }
-  })
-
-  return (
-    instances.length > 0
-    ? <Panel header="Deployed Contracts" headerClass="ResourceMenu-panel-outer">
-        {instances}
-      </Panel>
-    : undefined
-  )
+ContractInstanceButtons.propTypes = {
+  contractName: PropTypes.string,
+  createGraph: PropTypes.func,
+  deleteGraph: PropTypes.func,
+  deleteAllGraphs: PropTypes.func,
+  getCreateGraphParams: PropTypes.func,
+  selectGraph: PropTypes.func,
+  selectedGraphId: PropTypes.string,
+  completeAbiGraphId: PropTypes.string,
+  functionsGraphId: PropTypes.string,
 }
