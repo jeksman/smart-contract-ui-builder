@@ -10,7 +10,14 @@ import Grapher from './Grapher'
 import Header from './Header'
 import ResourceMenu from './ResourceMenu'
 
-import { addContractType, deploy } from '../redux/reducers/contracts'
+import {
+  addContractType,
+  addInstance,
+  callInstance,
+  deploy,
+  selectContractAddress,
+} from '../redux/reducers/contracts'
+
 import {
   createGraph,
   deleteGraph,
@@ -18,8 +25,15 @@ import {
   getCreateGraphParams,
   selectGraph,
 } from '../redux/reducers/grapher'
+
 import { logRenderError } from '../redux/reducers/renderErrors'
-import { closeContractForm, openContractForm } from '../redux/reducers/ui'
+
+import {
+  closeContractForm,
+  openContractForm,
+  selectContractFunction,
+} from '../redux/reducers/ui'
+
 import { getWeb3 } from '../redux/reducers/web3'
 
 import './style/App.css'
@@ -59,17 +73,19 @@ class App extends Component {
           <div className="App-bottom-row" >
             <div className="App-ResourceMenu-container" >
               <ResourceMenu
-              account={this.props.account}
-              networkId={this.props.networkId}
-              contractTypes={this.props.contractTypes}
-              contractInstances={this.props.contractInstances}
-              createGraph={this.props.createGraph}
-              getCreateGraphParams={getCreateGraphParams} // helper, not dispatch
-              deleteGraph={this.props.deleteGraph}
-              deleteAllGraphs={this.props.deleteAllGraphs}
-              selectGraph={this.props.selectGraph}
-              selectedGraphId={this.props.selectedGraphId}
-              hasGraphs={this.props.hasGraphs} />
+                account={this.props.account}
+                addInstance={this.props.addInstance}
+                networkId={this.props.networkId}
+                contractTypes={this.props.contractTypes}
+                contractInstances={this.props.contractInstances}
+                createGraph={this.props.createGraph}
+                getCreateGraphParams={getCreateGraphParams} // helper, not dispatch
+                deleteGraph={this.props.deleteGraph}
+                deleteAllGraphs={this.props.deleteAllGraphs}
+                selectGraph={this.props.selectGraph}
+                selectedGraphId={this.props.selectedGraphId}
+                selectContractAddress={this.props.selectContractAddress}
+                hasGraphs={this.props.hasGraphs} />
             </div>
             <div className="App-graph-container" >
               {
@@ -93,11 +109,15 @@ class App extends Component {
             {
               currentGraph
               ? <ContractForm
+                  contractAddress={this.props.selectedContractAddress}
                   nodes={currentGraph.config.elements.nodes}
                   contractName={currentGraph.name}
                   graphType={currentGraph.type}
                   deploy={this.props.deploy}
-                  closeContractForm={this.props.closeContractForm} />
+                  callInstance={this.props.callInstance}
+                  closeContractForm={this.props.closeContractForm}
+                  selectContractFunction={this.props.selectContractFunction}
+                  selectedContractFunction={this.props.selectedContractFunction} />
               : null
             }
           </ReactModal>
@@ -111,8 +131,12 @@ App.propTypes = {
   // contracts
   addContractType: PropTypes.func,
   deploy: PropTypes.func,
+  addInstance: PropTypes.func,
+  callInstance: PropTypes.func,
   contractInstances: PropTypes.object,
   contractTypes: PropTypes.object,
+  selectedContractAddress: PropTypes.string,
+  selectContractAddress: PropTypes.func,
   // grapher
   createGraph: PropTypes.func,
   deleteGraph: PropTypes.func,
@@ -127,6 +151,8 @@ App.propTypes = {
   contractModal: PropTypes.bool,
   closeContractForm: PropTypes.func,
   openContractForm: PropTypes.func,
+  selectContractFunction: PropTypes.func,
+  selectedContractFunction: PropTypes.string,
   // web3
   account: PropTypes.string,
   networkId: PropTypes.string,
@@ -145,12 +171,14 @@ function mapStateToProps (state) {
     // contracts
     contractInstances: state.contracts.instances,
     contractTypes: state.contracts.types,
+    selectedContractAddress: state.contracts.selectedAddress,
     // grapher
     selectedGraphId: state.grapher.selectedGraphId,
     selectedGraphObject: state.grapher.graphs[state.grapher.selectedGraphId],
     hasGraphs: Object.keys(state.grapher.graphs).length >= 1,
     // ui
-    contractModal: state.ui.forms.contractForm,
+    contractModal: state.ui.contractForm.open,
+    selectedContractFunction: state.ui.contractForm.selectedFunction,
     // web3
     account: state.web3.account,
     networkId: state.web3.networkId,
@@ -164,6 +192,11 @@ function mapDispatchToProps (dispatch) {
     addContractType: contractJSON => dispatch(addContractType(contractJSON)),
     deploy: (contractName, constructorParams) =>
       dispatch(deploy(contractName, constructorParams)),
+    addInstance: (contractName, address) =>
+      dispatch(addInstance(contractName, address)),
+    callInstance: (address, functionName, params=null, sender=null) =>
+      dispatch(callInstance(address, functionName, params, sender)),
+    selectContractAddress: address => dispatch(selectContractAddress(address)),
     // grapher
     createGraph: params => dispatch(createGraph(params)),
     deleteGraph: graphId => dispatch(deleteGraph(graphId)),
@@ -174,6 +207,7 @@ function mapDispatchToProps (dispatch) {
     // ui
     closeContractForm: () => dispatch(closeContractForm()),
     openContractForm: () => dispatch(openContractForm()),
+    selectContractFunction: func => dispatch(selectContractFunction(func)),
     // web3
     getWeb3: () => dispatch(getWeb3()),
   }

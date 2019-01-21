@@ -131,6 +131,10 @@ export default class ResourceMenu extends Component {
               <p>{address}</p>
               <ContractInstanceButtons
                 contractName={instance.type}
+                address={address}
+                selectContractAddress={this.props.selectContractAddress}
+                addInstance={_this.props.addInstance}
+                hasInstance={!!instance.truffleInstance}
                 completeAbiGraphId={completeAbiGraphId}
                 functionsGraphId={functionsGraphId}
                 getCreateGraphParams={_this.props.getCreateGraphParams}
@@ -155,6 +159,7 @@ export default class ResourceMenu extends Component {
 
 ResourceMenu.propTypes = {
   account: PropTypes.string,
+  addInstance: PropTypes.func,
   networkId: PropTypes.string,
   contractInstances: PropTypes.object,
   contractTypes: PropTypes.object,
@@ -164,6 +169,7 @@ ResourceMenu.propTypes = {
   getCreateGraphParams: PropTypes.func,
   selectGraph: PropTypes.func,
   selectedGraphId: PropTypes.string,
+  selectContractAddress: PropTypes.func,
   hasGraphs: PropTypes.bool,
 }
 
@@ -249,16 +255,24 @@ class ContractInstanceButtons extends Component {
   }
 
   onFunctionsClick () {
+    if (!this.props.hasInstance) {
+      this.props.addInstance(this.props.contractName, this.props.address)
+    }
     if (this.props.functionsGraphId) {
       this.props.selectGraph(this.props.functionsGraphId)
     } else {
       this.props.createGraph(this.props.getCreateGraphParams(
       'contract', 'functions', this.props.contractName))
     }
+    // TODO: unsafe (addInstance could take too long)
+    this.props.selectContractAddress(this.props.address)
   }
 }
 
 ContractInstanceButtons.propTypes = {
+  address: PropTypes.string,
+  addInstance: PropTypes.func,
+  hasInstance: PropTypes.bool,
   contractName: PropTypes.string,
   createGraph: PropTypes.func,
   deleteGraph: PropTypes.func,
@@ -266,6 +280,7 @@ ContractInstanceButtons.propTypes = {
   getCreateGraphParams: PropTypes.func,
   selectGraph: PropTypes.func,
   selectedGraphId: PropTypes.string,
+  selectContractAddress: PropTypes.func,
   completeAbiGraphId: PropTypes.string,
   functionsGraphId: PropTypes.string,
 }

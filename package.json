@@ -1,5 +1,5 @@
 {
-  "name": "smart-contract-ui-builderr",
+  "name": "smart-contract-ui-builder",
   "version": "0.0.0",
   "description": "Takes one or several smart contracts as inputs and represents their relationships as a graph",
   "private": true,
@@ -10,7 +10,8 @@
     "eject": "react-scripts eject"
   },
   "repository": {
-    "type": "git"
+    "type": "git",
+    "url": "git+https://gitlab.com/eugenekyselev/smart-contract-ui-builder.git"
   },
   "keywords": [
     "Ethereum",
@@ -25,16 +26,21 @@
   ],
   "author": "Eugene Kyselev <admin@profsite.com.ua>",
   "license": "MIT",
+  "bugs": {
+    "url": "https://gitlab.com/eugenekyselev/smart-contract-ui-builder/issues"
+  },
+  "homepage": "https://gitlab.com/eugenekyselev/smart-contract-ui-builder#readme",
   "dependencies": {
-
     "@material-ui/core": "^1.4.2",
     "ajv": "^6.5.2",
     "bootstrap": "^3.3.7",
-    "chain-end": "^0.3.0",
+    "chain-end": "^0.5.0",
     "cytoscape": "^3.2.14",
     "eslint": "^5.2.0",
     "immutable": "^3.8.2",
+    "jquery": "^3.3.1",
     "lodash": "^4.17.10",
+    "popper.js": "^1.14.4",
     "rc-collapse": "^1.9.3",
     "react": "^16.4.1",
     "react-bootstrap": "^0.32.1",
