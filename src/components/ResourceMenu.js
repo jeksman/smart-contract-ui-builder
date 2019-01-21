@@ -1,154 +1,224 @@
 
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
-import Collapse, { Panel } from 'rc-collapse'
+import React, { Component, Fragment } from 'react'
+import Divider from '@material-ui/core/Divider'
+import Typography from '@material-ui/core/Typography'
+import List from '@material-ui/core/List'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemIcon from '@material-ui/core/ListItemIcon'
+import ListItemText from '@material-ui/core/ListItemText'
+import ExpansionPanel from '@material-ui/core/ExpansionPanel'
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import DeleteIcon from '@material-ui/icons/Delete'
+import SubjectIcon from '@material-ui/icons/Subject'
+import GetAppIcon from '@material-ui/icons/GetApp'
 
 import { contractGraphTypes } from '../graphing/parseContract'
 
-import 'rc-collapse/assets/index.css'
+import ContractInstancesList from './ContractInstancesList'
+
 import './style/ResourceMenu.css'
 
 export default class ResourceMenu extends Component {
 
-  // componentDidMount () {
-  //   this.setState((prevProps, props) => {
+  constructor (props) {
 
-  //   }
-  // }
+    super(props)
+    this.state = { storageHref: getStorageHref()}
+  }
+
+  componentDidUpdate (prevProps) {
+
+    if (prevProps.contractInstances !== this.props.contractInstances) {
+      this.setState({ storageHref: getStorageHref()})
+    }
+  }
 
   render () {
+
+    const classes = this.props.classes
+
+    const listHeadingStyle = {
+      whiteSpace: 'nowrap',
+    }
+
+    const hasNoContractTypes =
+      !this.props.contractTypes ||
+      Object.keys(this.props.contractTypes).length === 0
+
+    const hasNoContractInstances =
+      !this.props.account ||
+      !this.props.networkId ||
+      !this.props.contractInstances ||
+      !this.props.contractInstances.hasOwnProperty(this.props.networkId)
+
     return (
-      <div className="ResourceMenu" >
-        <div className="ResourceMenu-delete-buttons">
-          <button
-            className="ResourceMenu-button"
-            disabled={!this.props.selectedGraphId}
-            onClick={() => this.props.deleteGraph(this.props.selectedGraphId)}
-          >
-            Delete Selected Graph
-          </button>
-          <button
-            className="ResourceMenu-button"
-            disabled={!this.props.hasGraphs}
-            onClick={this.props.deleteAllGraphs}
-          >
-            Delete All Graphs
-          </button>
+      <Fragment>
+        <div className="Header-links">
+
         </div>
-        <Collapse accordion={true} >
-          <Panel
-            header="Contract Types"
-            headerClass="ResourceMenu-panel-outer"
-          >
-           {this.getContractsJSX()}
-          </Panel>
-          {this.getContractInstancesJSX()}
-        </Collapse>
-      </div>
+        <Divider/>
+        <div className="ResourceMenu-delete-buttons">
+          <List>
+            <ListItem button
+
+            >
+              <ListItemIcon>
+                <GetAppIcon />
+              </ListItemIcon>
+              <ListItemText>
+                <a
+                  href={this.state.storageHref}
+                  download="dapp-grapher-state.json"
+                  style={{
+                    textDecoration: 'inherit',
+                    color: 'inherit',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Download State
+                </a>
+              </ListItemText>
+            </ListItem>
+            <Divider/>
+            <ListItem button
+              disabled={!this.props.selectedGraphId}
+              onClick={
+                () => this.props.deleteGraph(this.props.selectedGraphId)
+              }
+            >
+              <ListItemIcon>
+                <DeleteIcon />
+              </ListItemIcon>
+              <ListItemText primary="Delete Selected Graph" />
+            </ListItem>
+            <ListItem button
+              disabled={!this.props.hasGraphs}
+              onClick={this.props.deleteAllGraphs}
+            >
+              <ListItemIcon>
+                <DeleteIcon />
+              </ListItemIcon>
+              <ListItemText primary="Delete All Graphs" />
+            </ListItem>
+          </List>
+        </div>
+        <Divider />
+        <ExpansionPanel
+          id="ResourceMenu-contractTypes-panel"
+          disabled={hasNoContractTypes}
+        >
+          <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography className={classes.heading} style={listHeadingStyle}>
+              Contract Types
+            </Typography>
+          </ExpansionPanelSummary>
+          {hasNoContractTypes ? null : this.getContractTypesJSX()}
+        </ExpansionPanel>
+        <ExpansionPanel
+          id="ResourceMenu-contractInstances-panel"
+          disabled={hasNoContractInstances}
+        >
+          <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography className={classes.heading} style={listHeadingStyle}>
+              Contract Instances
+            </Typography>
+          </ExpansionPanelSummary>
+          {hasNoContractInstances ? null : this.getContractInstancesJSX()}
+        </ExpansionPanel>
+      </Fragment>
     )
   }
 
   /**
    * Gets the JSX representing available contract types for deployment
-   * @return {jsx}  one <ContractTypeButton> for every contract type in props
+   * @return {jsx}  a list of available contract types
    */
-  getContractsJSX = () => {
-
-    if (
-      !this.props.contractTypes ||
-      Object.keys(this.props.contractTypes
-    ) === 0) {
-      return <p>Please add some contract types.</p>
-    }
+  getContractTypesJSX = () => {
 
     const contractTypeNames = Object.keys(this.props.contractTypes)
     contractTypeNames.sort()
 
-    const thisTarget = this
-    const contracts = []
-    contractTypeNames.forEach(contractName => {
+    const resourceMenu = this
 
-      const graphId =
-        thisTarget.props.contractTypes[contractName][contractGraphTypes._constructor]
+    const contractTypes = contractTypeNames.map(contractName => {
 
-      contracts.push(
-        <ContractTypeButton
+      const currentGraphId =
+        resourceMenu.props.contractTypes[contractName][contractGraphTypes._constructor]
+
+      return (
+        <ContracTypeListButton
           key={contractName}
           contractName={contractName}
-          graphId={graphId}
-          getCreateGraphParams={thisTarget.props.getCreateGraphParams}
-          createGraph={thisTarget.props.createGraph}
-          selectGraph={thisTarget.props.selectGraph}
-          selectedGraphId={thisTarget.props.selectedGraphId} />
+          graphId={currentGraphId}
+          getCreateGraphParams={resourceMenu.props.getCreateGraphParams}
+          createGraph={resourceMenu.props.createGraph}
+          selectGraph={resourceMenu.props.selectGraph}
+          selectedGraphId={resourceMenu.props.selectedGraphId} />
       )
     })
-    return contracts
+
+    return (
+      <List>
+        {contractTypes}
+      </List>
+    )
   }
 
   /**
    * Gets the JSX representing deployed contracts (instances) for the current
    * network and account
-   * @return {jsx}  Panel with one Collapse child for every deployed instance
-   *                associated with the account and network id in props
+   * @return {jsx}  TODO
    */
   getContractInstancesJSX = () => {
 
-    if (
-      !this.props.account ||
-      !this.props.networkId ||
-      !this.props.contractInstances ||
-      !this.props.contractInstances.hasOwnProperty(this.props.networkId)
-    ) return
-
     const _this = this
-    const instances = []
+
+    // get all instances for current account and networkId by type
+    const instanceTypes = {}
     Object.keys(
-      this.props.contractInstances[_this.props.networkId]).forEach(address => {
+      this.props.contractInstances[this.props.networkId]
+    ).forEach(address => {
 
       const instance =
         _this.props.contractInstances[_this.props.networkId][address]
+
       if (instance.account === _this.props.account) {
-
-        // instance.type is the same as contractName
-        const functionsGraphId =
-          _this.props.contractTypes[instance.type][contractGraphTypes.functions]
-
-        instances.push(
-          <Collapse key={address + ':collapse'} >
-            <Panel
-              key={address + ':panel'}
-              header={instance.type}
-              headerClass="ResourceMenu-panel-inner"
-            >
-              <p>{address}</p>
-              <ContractInstanceButtons
-                contractName={instance.type}
-                address={address}
-                selectContractAddress={this.props.selectContractAddress}
-                addInstance={_this.props.addInstance}
-                hasInstance={!!instance.truffleInstance}
-                functionsGraphId={functionsGraphId}
-                getCreateGraphParams={_this.props.getCreateGraphParams}
-                createGraph={_this.props.createGraph}
-                selectGraph={_this.props.selectGraph}
-                selectedGraphId={_this.props.selectedGraphId} />
-            </Panel>
-          </Collapse>
-        )
+        if (instanceTypes[instance.type]) {
+          instanceTypes[instance.type][address] = !!instance.truffleInstance
+        } else {
+          instanceTypes[instance.type] = {
+            [address]: !!instance.truffleInstance,
+          }
+        }
       }
     })
 
+    if (Object.keys(instanceTypes).length === 0) return null // sanity
+
+    const _classes = {
+      nested: _this.props.classes.nested,
+      root: _this.props.classes.root,
+    }
+
     return (
-      instances.length > 0
-      ? <Panel header="Deployed Contracts" headerClass="ResourceMenu-panel-outer">
-          {instances}
-        </Panel>
-      : undefined
+      <ContractInstancesList
+        classes={_classes}
+        contractTypes={_this.props.contractTypes}
+        instanceTypes={instanceTypes}
+        selectContractAddress={_this.props.selectContractAddress}
+        addInstance={_this.props.addInstance}
+        getCreateGraphParams={_this.props.getCreateGraphParams}
+        createGraph={_this.props.createGraph}
+        selectGraph={_this.props.selectGraph}
+        selectedGraphId={_this.props.selectedGraphId} />
     )
   }
 }
 
 ResourceMenu.propTypes = {
+  classes: PropTypes.object,
   account: PropTypes.string,
   addInstance: PropTypes.func,
   networkId: PropTypes.string,
@@ -162,22 +232,25 @@ ResourceMenu.propTypes = {
   selectedGraphId: PropTypes.string,
   selectContractAddress: PropTypes.func,
   hasGraphs: PropTypes.bool,
+  drawerOpen: PropTypes.bool,
 }
 
 /* subcomponents */
 
-class ContractTypeButton extends Component {
+class ContracTypeListButton extends Component {
 
   render () {
     return (
-      <button
-        className="ResourceMenu-button"
+      <ListItem button
         disabled={this.props.selectedGraphId &&
           this.props.selectedGraphId === this.props.graphId}
         onClick={this.onContractTypeClick}
       >
-        {this.props.contractName}
-      </button>
+        <ListItemIcon>
+          <SubjectIcon />
+        </ListItemIcon>
+        <ListItemText primary={this.props.contractName} />
+      </ListItem>
     )
   }
 
@@ -186,12 +259,14 @@ class ContractTypeButton extends Component {
       this.props.selectGraph(this.props.graphId)
     } else {
       this.props.createGraph(this.props.getCreateGraphParams(
-        'contract', contractGraphTypes._constructor, this.props.contractName))
+        contractGraphTypes._constructor,
+        { contractName: this.props.contractName }
+      ))
     }
   }
 }
 
-ContractTypeButton.propTypes = {
+ContracTypeListButton.propTypes = {
   contractName: PropTypes.string,
   createGraph: PropTypes.func,
   getCreateGraphParams: PropTypes.func,
@@ -200,49 +275,14 @@ ContractTypeButton.propTypes = {
   graphId: PropTypes.string,
 }
 
-class ContractInstanceButtons extends Component {
+/**
+ * HELPERS
+ */
 
-  render () {
-    return (
-      <div>
-        <button
-          className="ResourceMenu-button"
-          disabled={this.props.selectedGraphId &&
-            this.props.selectedGraphId === this.props.functionsGraphId}
-          onClick={this.onFunctionsClick}
-        >
-          Functions
-        </button>
-      </div>
-    )
-  }
-
-  onFunctionsClick = () => {
-    if (!this.props.hasInstance) {
-      this.props.addInstance(this.props.contractName, this.props.address)
-    }
-    if (this.props.functionsGraphId) {
-      this.props.selectGraph(this.props.functionsGraphId)
-    } else {
-      this.props.createGraph(this.props.getCreateGraphParams(
-      'contract', contractGraphTypes.functions, this.props.contractName))
-    }
-    // TODO: unsafe (addInstance could take too long)
-    this.props.selectContractAddress(this.props.address)
-  }
-}
-
-ContractInstanceButtons.propTypes = {
-  address: PropTypes.string,
-  addInstance: PropTypes.func,
-  hasInstance: PropTypes.bool,
-  contractName: PropTypes.string,
-  createGraph: PropTypes.func,
-  deleteGraph: PropTypes.func,
-  deleteAllGraphs: PropTypes.func,
-  getCreateGraphParams: PropTypes.func,
-  selectGraph: PropTypes.func,
-  selectedGraphId: PropTypes.string,
-  selectContractAddress: PropTypes.func,
-  functionsGraphId: PropTypes.string,
+/**
+ * encodes persisted storage as an href for downloading
+ * @return {string} href attribute for an HTML anchor
+ */
+function getStorageHref () {
+ return 'data:text/plain;charset=utf-8,' + encodeURIComponent(window.localStorage.getItem('dapp-grapher'))
 }

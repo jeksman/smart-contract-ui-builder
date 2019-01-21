@@ -71,12 +71,6 @@ const jointHelper = {
 export default jointHelper
 
 /**
- * CUSTOM ELEMENT DEFINITIONS
- */
-
-// TBD?
-
-/**
  * GRAPH GETTERS
  */
 
@@ -130,8 +124,8 @@ function generateFunctionsElements (dappGraph) {
 
   const functionElements = functionNodes.map(node => {
 
-    const ioNodes = allNodes.filter( n => n.parent === node.id)
-    
+    const ioNodes = allNodes.filter(n => n.parent === node.id)
+
     const funcElement = generateAtomic(
       node.displayName,
       {
@@ -290,7 +284,7 @@ function initializePaper (jointElement, graph, eventHandlers) {
     panning: false,
   }
 
-  paper.scale(0.9)
+  paper.scale(0.8)
 
   addPaperEventHandlers(paper, eventHandlers)
 
@@ -301,7 +295,7 @@ function addPaperEventHandlers (paper, handlers) {
 
   // open contract form
   paper.on('element:pointerdblclick', (view, evt, x, y) => {
-    
+
     console.log(view, evt) // dev temp
 
     const nodeType = getCustomAttributeFromView(view, 'type')
