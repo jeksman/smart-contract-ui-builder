@@ -25,22 +25,42 @@ use at your own risk.
 - Many bugs can be resolved by clearing your Chromium browser's local storage.
 
 
-## Contributions and Roadmap
+### Immediate Goals
 
-smart-contract-ui-builder is one small part of the wider effort in the Ethereum community to scale the platform and promote blockchain adoption worldwide. If you are interested in the reasoning behind it, see [this Medium article](https://medium.com/pennblockchain/the-case-for-graphical-smart-contract-editors-8e721cdcde93).
+Before more features are added, smart-contract-ui-builder need work. 
 
-# todo
-- write immediate goals
-- write longer-term goals
-- add most critical issues here
-- create some issues
-- review repo for blocking issues
-- make public
+1. Refactor graph backend to use [`graphlib`](https://www.npmjs.com/package/graphlib) instead of the hacky bespoke schema currently in use
+	- **Note:** This is a blocker since the graph schema is fundamental to much of smart-contract-ui-builder's functionality
+- Refactor Redux middleware from `redux-thunk` to [`redux-saga`](https://www.npmjs.com/package/redux-saga)
+	- `redux-saga` was designed precisely to deal with the kind of failure-prone, asynchronous work that smart-contract-ui-builder is rife with
+	- **Note:** This is also something of blocker since anything `web3`-related is asynchronous and currently bound up in thunks
+- Refactor existing, hacky state-persistence functionality to use [`redux-persist`](https://www.npmjs.com/package/redux-persist), and enable state importing in the process
+- Fix testing and error handling
+	- Determine testing framework
+	- Write Tests
+		- Reducer unit tests
+		- State persistence tests
+		- Component tests
+	- Add [`redux-devtools`](https://github.com/reduxjs/redux-devtools) support.
+- "Robustifying," a.k.a. undoing/making up for shortcuts taken during early development
+	- [`@material-ui`](https://www.npmjs.com/package/@material-ui/core) usage
+		- Consistent style management should be enforced, and dead/useless class passing should be minimized
+	- Move application logic contained in components into reducers
+	- Normalize entire Redux store per [`normalizr`](https://github.com/paularmstrong/normalizr )
+	- To find more: `grep -RF 'TODO' smart-contract-ui-builder/src`
 
-### check if this is implemented
-- Improve web3 error handling (currently perfunctory/unrealistic)
-- Add `load-json-file` once `graceful-fs` has been updated for `create-react-app` compatibility
-    - Follow issue at: https://github.com/isaacs/node-graceful-fs/pull/135
-- UX
-    - Add modal that can only be closed by logging in to MetaMask (check using web3.eth.getAccounts() on a handler for a user-triggered event, like clicking "OK" in the modal)
-        - utilize state.web3.ready (a boolean) to accomplish this
+### Longer-Term Goals
+
+Reasons to download this repo.
+
+- Add [`drizzle`](https://github.com/trufflesuite/drizzle) support
+	- `drizzle` has a ton of awesome features for interacting with `web3` entities
+	- This will give the user a live view of the states of their dapps
+- Add post-deployment setup workflows to dapp templates
+	- For instance, an allowance must be set to enable a crowdsale to spend tokens on the user's behalf after deployment, but this can only be done manually at the moment.
+- Allow the usage of already published contracts in dapp templates
+- Create bespoke UIs for common contracts, such as ERC20 tokens
+
+# License
+
+MIT
