@@ -3,8 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="5a771b51-a307-461e-a119-49a96d08f91e" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/src/index.js" afterPath="$PROJECT_DIR$/src/index.js" />
-      <change beforePath="$PROJECT_DIR$/src/redux/reducers/web3.js" afterPath="$PROJECT_DIR$/src/redux/reducers/web3.js" />
+      <change beforePath="$PROJECT_DIR$/src/components/Web3Gatekeeper.js" afterPath="$PROJECT_DIR$/src/components/Web3Gatekeeper.js" />
+      <change beforePath="$PROJECT_DIR$/src/components/common/EthereumIcon.js" afterPath="$PROJECT_DIR$/src/components/common/EthereumIcon.js" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -53,8 +53,8 @@
       <file leaf-file-name="web3.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/redux/reducers/web3.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="403">
-              <caret line="138" column="0" lean-forward="false" selection-start-line="138" selection-start-column="0" selection-end-line="138" selection-end-column="0" />
+            <state relative-caret-position="238">
+              <caret line="127" column="30" lean-forward="true" selection-start-line="127" selection-start-column="30" selection-end-line="127" selection-end-column="30" />
               <folding />
             </state>
           </provider>
@@ -380,7 +380,7 @@
       <option name="presentableId" value="Default" />
       <updated>1547632775780</updated>
       <workItem from="1547632777524" duration="802000" />
-      <workItem from="1547633844931" duration="15767000" />
+      <workItem from="1547633844931" duration="15831000" />
     </task>
     <task id="LOCAL-00001" summary="add react-router-dom, add basic dynamic form generations. minor refactoring">
       <created>1547717914471</created>
@@ -550,11 +550,18 @@
       <option name="project" value="LOCAL" />
       <updated>1548138241557</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="git add basic EIP1102 UX solution">
+      <created>1548138297329</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1548138297329</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="16569000" />
+    <option name="totallyTimeSpent" value="16633000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -654,7 +661,8 @@
     <MESSAGE value="commenting complete" />
     <MESSAGE value="update README.md" />
     <MESSAGE value="add EIP1102 compliance" />
-    <option name="LAST_COMMIT_MESSAGE" value="add EIP1102 compliance" />
+    <MESSAGE value="git add basic EIP1102 UX solution" />
+    <option name="LAST_COMMIT_MESSAGE" value="git add basic EIP1102 UX solution" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -1074,8 +1082,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/redux/reducers/web3.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="403">
-          <caret line="138" column="0" lean-forward="false" selection-start-line="138" selection-start-column="0" selection-end-line="138" selection-end-column="0" />
+        <state relative-caret-position="238">
+          <caret line="127" column="30" lean-forward="true" selection-start-line="127" selection-start-column="30" selection-end-line="127" selection-end-column="30" />
           <folding />
         </state>
       </provider>
