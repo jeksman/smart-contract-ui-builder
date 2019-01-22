@@ -4,7 +4,6 @@
     <list default="true" id="5a771b51-a307-461e-a119-49a96d08f91e" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/src/components/Web3Gatekeeper.js" afterPath="$PROJECT_DIR$/src/components/Web3Gatekeeper.js" />
-      <change beforePath="$PROJECT_DIR$/src/components/common/EthereumIcon.js" afterPath="$PROJECT_DIR$/src/components/common/EthereumIcon.js" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -50,11 +49,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="web3.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="web3.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/redux/reducers/web3.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="238">
               <caret line="127" column="30" lean-forward="true" selection-start-line="127" selection-start-column="30" selection-end-line="127" selection-end-column="30" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Web3Gatekeeper.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/components/Web3Gatekeeper.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="403">
+              <caret line="130" column="0" lean-forward="true" selection-start-line="130" selection-start-column="0" selection-end-line="130" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -120,16 +129,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/public/index.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="58">
-              <caret line="21" column="12" lean-forward="false" selection-start-line="21" selection-start-column="12" selection-end-line="21" selection-end-column="12" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
     </leaf>
   </component>
   <component name="FindInProjectRecents">
@@ -162,6 +161,7 @@
         <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/src/redux/reducers/web3.js" />
+        <option value="$PROJECT_DIR$/src/components/Web3Gatekeeper.js" />
       </list>
     </option>
   </component>
@@ -175,7 +175,7 @@
     <handled-path value="$PROJECT_DIR$/node_modules" />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="50" />
+    <option name="x" value="196" />
     <option name="y" value="23" />
     <option name="width" value="1440" />
     <option name="height" value="810" />
@@ -380,7 +380,7 @@
       <option name="presentableId" value="Default" />
       <updated>1547632775780</updated>
       <workItem from="1547632777524" duration="802000" />
-      <workItem from="1547633844931" duration="15831000" />
+      <workItem from="1547633844931" duration="15903000" />
     </task>
     <task id="LOCAL-00001" summary="add react-router-dom, add basic dynamic form generations. minor refactoring">
       <created>1547717914471</created>
@@ -557,11 +557,18 @@
       <option name="project" value="LOCAL" />
       <updated>1548138297329</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="add switcher to EIP1102 solution">
+      <created>1548138357878</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1548138357878</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="16633000" />
+    <option name="totallyTimeSpent" value="16705000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -573,7 +580,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="50" y="23" width="1440" height="810" extended-state="0" />
+    <frame x="196" y="23" width="1440" height="810" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -662,7 +669,8 @@
     <MESSAGE value="update README.md" />
     <MESSAGE value="add EIP1102 compliance" />
     <MESSAGE value="git add basic EIP1102 UX solution" />
-    <option name="LAST_COMMIT_MESSAGE" value="git add basic EIP1102 UX solution" />
+    <MESSAGE value="add switcher to EIP1102 solution" />
+    <option name="LAST_COMMIT_MESSAGE" value="add switcher to EIP1102 solution" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -1084,6 +1092,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
           <caret line="127" column="30" lean-forward="true" selection-start-line="127" selection-start-column="30" selection-end-line="127" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/components/Web3Gatekeeper.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="403">
+          <caret line="130" column="0" lean-forward="true" selection-start-line="130" selection-start-column="0" selection-end-line="130" selection-end-column="0" />
           <folding />
         </state>
       </provider>
