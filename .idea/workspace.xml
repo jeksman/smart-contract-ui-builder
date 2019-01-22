@@ -4,6 +4,7 @@
     <list default="true" id="5a771b51-a307-461e-a119-49a96d08f91e" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
+      <change beforePath="$PROJECT_DIR$/src/redux/reducers/web3.js" afterPath="$PROJECT_DIR$/src/redux/reducers/web3.js" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -36,15 +37,25 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="273">
-                <caret line="49" column="62" lean-forward="false" selection-start-line="49" selection-start-column="62" selection-end-line="49" selection-end-column="62" />
+              <first_editor relative-caret-position="174">
+                <caret line="58" column="4" lean-forward="false" selection-start-line="58" selection-start-column="4" selection-end-line="58" selection-end-column="4" />
                 <folding />
               </first_editor>
               <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="web3.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/redux/reducers/web3.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="403">
+              <caret line="140" column="0" lean-forward="true" selection-start-line="140" selection-start-column="0" selection-end-line="140" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -57,18 +68,6 @@
               <folding>
                 <marker date="1548137663301" expanded="true" signature="311:668" ph="{...}" />
                 <marker date="1548137663301" expanded="true" signature="689:790" ph="{&quot;web3Injected&quot;: PropTypes.bool...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DropdownMenu.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/components/common/DropdownMenu.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding>
-                <marker date="1548137663302" expanded="true" signature="1459:2527" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -160,6 +159,7 @@
         <option value="$PROJECT_DIR$/src/components/App.js" />
         <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/src/redux/reducers/web3.js" />
       </list>
     </option>
   </component>
@@ -222,13 +222,6 @@
               <item name="smart-contract-ui-builder" type="b2602c69:ProjectViewProjectNode" />
               <item name="smart-contract-ui-builder" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="components" type="462c0819:PsiDirectoryNode" />
-              <item name="common" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="smart-contract-ui-builder" type="b2602c69:ProjectViewProjectNode" />
-              <item name="smart-contract-ui-builder" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="graphing" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -236,6 +229,13 @@
               <item name="smart-contract-ui-builder" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="redux" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="smart-contract-ui-builder" type="b2602c69:ProjectViewProjectNode" />
+              <item name="smart-contract-ui-builder" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="redux" type="462c0819:PsiDirectoryNode" />
+              <item name="reducers" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="smart-contract-ui-builder" type="b2602c69:ProjectViewProjectNode" />
@@ -378,7 +378,7 @@
       <option name="presentableId" value="Default" />
       <updated>1547632775780</updated>
       <workItem from="1547632777524" duration="802000" />
-      <workItem from="1547633844931" duration="15378000" />
+      <workItem from="1547633844931" duration="15717000" />
     </task>
     <task id="LOCAL-00001" summary="add react-router-dom, add basic dynamic form generations. minor refactoring">
       <created>1547717914471</created>
@@ -534,11 +534,18 @@
       <option name="project" value="LOCAL" />
       <updated>1548137740187</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="update README.md">
+      <created>1548137893175</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1548137893175</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="16180000" />
+    <option name="totallyTimeSpent" value="16519000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -635,9 +642,9 @@
     <MESSAGE value="basic dapp deployment complete" />
     <MESSAGE value="proof of concept demo implementaton, add basic add contract type implemetation, add file upload and read fuctionality, reducer cleanup" />
     <MESSAGE value="fresh 'npm install', resolve css issues" />
-    <MESSAGE value="update README.md" />
     <MESSAGE value="commenting complete" />
-    <option name="LAST_COMMIT_MESSAGE" value="commenting complete" />
+    <MESSAGE value="update README.md" />
+    <option name="LAST_COMMIT_MESSAGE" value="update README.md" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -878,14 +885,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/redux/reducers/web3.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-972">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/redux/reducers/contracts.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="403">
@@ -1053,11 +1052,19 @@
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="273">
-            <caret line="49" column="62" lean-forward="false" selection-start-line="49" selection-start-column="62" selection-end-line="49" selection-end-column="62" />
+          <first_editor relative-caret-position="174">
+            <caret line="58" column="4" lean-forward="false" selection-start-line="58" selection-start-column="4" selection-end-line="58" selection-end-column="4" />
             <folding />
           </first_editor>
           <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/redux/reducers/web3.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="403">
+          <caret line="140" column="0" lean-forward="true" selection-start-line="140" selection-start-column="0" selection-end-line="140" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

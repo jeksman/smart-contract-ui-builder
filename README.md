@@ -19,6 +19,8 @@ smart-contract-ui-builder is still a prototype. In using it, you will find bugs,
 No security or performance guarantees are made about the default contracts types or any contract or dapp you deploy
 or interact with using smart-contract-ui-builder.
 
+When you have saved your template, select it to deploy a new instance. Double-click the contract constructors to enter your desired parameters. When you select deploy, the contracts will be published to your current Ethereum network in the order defined by the template.
+
 use at your own risk.
 
 ### Technical Notes
@@ -52,7 +54,12 @@ Before more features are added, smart-contract-ui-builder need work.
 ### Longer-Term Goals
 
 Reasons to download this repo.
-
+	- Currently, all contracts in a dapp template are deployed at the same time
+	- Allow the user to designate function calls to be performed after all contracts have been deployed
+	- For instance, an allowance must be set to enable a crowdsale to spend tokens on the user's behalf after deployment, but this can only be done manually at the moment
+- Create bespoke UIs for common contracts, such as ERC20 tokens
+- Add [Etherscan](https://etherscan.io/) integration
+	- For instance, enable minimal-click Etherscan ABI validation
 - Add [`drizzle`](https://github.com/trufflesuite/drizzle) support
 	- `drizzle` has a ton of awesome features for interacting with `web3` entities
 	- This will give the user a live view of the states of their dapps
@@ -64,3 +71,4 @@ Reasons to download this repo.
 # License
 
 MIT
+
