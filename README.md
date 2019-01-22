@@ -9,7 +9,8 @@ Use the default contracts or add your own. Any valid contract will work. All you
 - Install and log in to MetaMask
   - smart-contract-ui-builder has only been tested using Chrome
 - Select an Ethereum network of your choice
-  - For easier testing/development, use `npm run ganache`
+  - For easier testing/development, use `npm run ganache` and connect to
+  "Localhost 8545"
 - `npm run start`
 
 ### Disclaimer
@@ -19,6 +20,10 @@ No security or performance guarantees are made about the default contracts types
 or interact with using smart-contract-ui-builder.
 
 use at your own risk.
+
+### Technical Notes
+- Many bugs can be resolved by clearing your Chromium browser's local storage.
+
 
 ## Contributions and Roadmap
 
