@@ -34,7 +34,7 @@
     "@material-ui/core": "^1.5.0",
     "@material-ui/icons": "^2.0.2",
     "ajv": "^6.5.2",
-    "chain-end": "^0.5.4",
+    "chain-end": "https://github.com/jeksman/chain-end.git",
     "dagre": "^0.8.2",
     "graphlib": "^2.1.5",
     "immutable": "^3.8.2",

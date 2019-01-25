@@ -1,0 +1,67 @@
+{
+  "_from": "chain-end@^0.5.4",
+  "_id": "chain-end@0.5.4",
+  "_inBundle": false,
+  "_integrity": "sha512-qDeHekgwJjU+fOwP5WlJHIDkzCrfsxqbJ+CionlbwuByV8FqT3E+bUmTSJj+idK6RDq6nnDn6ROCC779tgIAgg==",
+  "_location": "/chain-end",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "range",
+    "registry": true,
+    "raw": "chain-end@^0.5.4",
+    "name": "chain-end",
+    "escapedName": "chain-end",
+    "rawSpec": "^0.5.4",
+    "saveSpec": null,
+    "fetchSpec": "^0.5.4"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/chain-end/-/chain-end-0.5.4.tgz",
+  "_shasum": "662d3cd0525c9570ec7c4e45bb754b2928b726f2",
+  "_spec": "chain-end@^0.5.4",
+  "_where": "/Users/tecsyntsupport/Desktop/Workflow/smartcontract-ui-builder",
+  "author": {
+    "name": "Erik Marks",
+    "email": "rekmarks@icloud.com"
+  },
+  "bugs": {
+    "url": "https://github.com/rekmarks/chain-end/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "openzeppelin-solidity-metadata": "^1.4.2",
+    "truffle-contract": "^3.0.6",
+    "web3": "^1.0.0-beta.34"
+  },
+  "deprecated": false,
+  "description": "Programmatic pre-compiled Truffle contract deployment, and soon, more",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "ganache-cli": "^6.1.4",
+    "mocha": "^5.2.0",
+    "openzeppelin-solidity": "^1.12.0",
+    "truffle": "^4.1.14"
+  },
+  "homepage": "https://github.com/rekmarks/chain-end#readme",
+  "keywords": [
+    "Ethereum",
+    "smart",
+    "contracts",
+    "Truffle",
+    "Solidity"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "name": "chain-end",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rekmarks/chain-end.git"
+  },
+  "scripts": {
+    "test": "mocha",
+    "test:debug": "mocha --inspect-brk --inspect"
+  },
+  "version": "0.5.4"
+}
