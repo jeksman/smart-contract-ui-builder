@@ -2,6 +2,9 @@
   "name": "smart-contract-ui-builder",
   "version": "0.1.0",
   "description": "Takes one or several smart contracts as inputs and represents their relationships as a graph",
+  "engines": {
+    "node": "11.6.0"
+  },
   "private": true,
   "scripts": {
     "start": "react-scripts start",
@@ -34,7 +37,7 @@
     "@material-ui/core": "^1.5.0",
     "@material-ui/icons": "^2.0.2",
     "ajv": "^6.5.2",
-    "chain-end": "https://github.com/jeksman/chain-end.git",
+    "chain-end": "^0.6.2",
     "dagre": "^0.8.2",
     "graphlib": "^2.1.5",
     "immutable": "^3.8.2",
